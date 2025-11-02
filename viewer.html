@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPMN Viewer</title>
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@9.4.0/dist/assets/diagram-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@9.4.0/dist/assets/bpmn-js.css">
+    <style>
+        #bpmn-container {
+            width: 100%;
+            height: 60vh;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+
+        body {
+            margin: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .controls {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+
+        button:hover {
+            background: #005a9e;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin: 10px 0;
+            padding: 10px;
+            font-family: monospace;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .tab {
+            margin: 10px 0;
+        }
+
+        .tab-button {
+            background: #e0e0e0;
+            color: black;
+        }
+
+        .tab-button.active {
+            background: #007acc;
+            color: white;
+        }
+
+        .error {
+            color: red;
+            margin: 10px 0;
+            padding: 10px;
+            background: #ffe6e6;
+            border: 1px solid red;
+            border-radius: 3px;
+        }
+
+        .success {
+            color: green;
+            margin: 10px 0;
+            padding: 10px;
+            background: #e6ffe6;
+            border: 1px solid green;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>BPMN Viewer</h1>
+
+    <!-- Табы для переключения между способами загрузки -->
+    <div class="tab">
+        <button class="tab-button active" onclick="showTab('text-tab')">Загрузить из текста</button>
+        <button class="tab-button" onclick="showTab('file-tab')">Загрузить из файла</button>
+    </div>
+
+    <!-- Вкладка для текстового ввода -->
+    <div id="text-tab" class="tab-content">
+        <h3>Вставьте BPMN XML:</h3>
+        <textarea id="xml-input" placeholder="Вставьте BPMN XML сюда..."></textarea>
+        <button onclick="loadFromTextarea()">Загрузить BPMN</button>
+        <button onclick="loadExample()">Загрузить пример</button>
+    </div>
+
+    <!-- Вкладка для загрузки файла -->
+    <div id="file-tab" class="tab-content" style="display: none;">
+        <h3>Выберите BPMN файл:</h3>
+        <input type="file" id="fileInput" accept=".bpmn,.xml" />
+        <button onclick="document.getElementById('fileInput').click()">Выбрать файл</button>
+    </div>
+
+    <!-- Сообщения об ошибках/успехе -->
+    <div id="message"></div>
+
+    <!-- Элементы управления -->
+    <div class="controls">
+        <button onclick="zoomIn()">Увеличить (+)</button>
+        <button onclick="zoomOut()">Уменьшить (-)</button>
+        <button onclick="fitViewport()">Подогнать по размеру</button>
+        <button onclick="downloadSVG()">Скачать как SVG</button>
+        <button onclick="downloadBPMN()">Скачать как BPMN</button>
+    </div>
+
+    <!-- Контейнер для BPMN -->
+    <div id="bpmn-container"></div>
+
+    <!-- Подключаем библиотеки -->
+    <script src="https://unpkg.com/bpmn-js@9.4.0/dist/bpmn-viewer.development.js"></script>
+
+    <script>
+        // Инициализация BPMN viewer
+        let viewer = new BpmnJS({
+            container: '#bpmn-container'
+        });
+
+        // Пример BPMN XML по умолчанию
+        const defaultXML = `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_1" name="Начало процесса" />
+    <bpmn:task id="Task_1" name="Первая задача" />
+    <bpmn:task id="Task_2" name="Вторая задача" />
+    <bpmn:endEvent id="EndEvent_1" name="Конец процесса" />
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_1" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="Task_2" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_2" targetRef="EndEvent_1" />
+  </bpmn:process>
+</bpmn:definitions>`;
+
+        // Загружаем пример при старте
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('xml-input').value = defaultXML;
+            loadXML(defaultXML);
+        });
+
+        // Функции управления вкладками
+        function showTab(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+
+            // Показываем выбранную вкладку
+            document.getElementById(tabName).style.display = 'block';
+
+            // Обновляем активные кнопки
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Основная функция загрузки XML
+        function loadXML(xml) {
+            showMessage('Загрузка BPMN...', 'info');
+
+            viewer.importXML(xml)
+                .then(() => {
+                    showMessage('BPMN диаграмма успешно загружена!', 'success');
+                    fitViewport();
+                })
+                .catch(err => {
+                    console.error('Ошибка загрузки BPMN:', err);
+                    showMessage('Ошибка загрузки BPMN: ' + err.message, 'error');
+                });
+        }
+
+        // Загрузка из textarea
+        function loadFromTextarea() {
+            const xml = document.getElementById('xml-input').value.trim();
+            if (xml) {
+                loadXML(xml);
+            } else {
+                showMessage('Введите BPMN XML в текстовое поле', 'error');
+            }
+        }
+
+        // Загрузка примера
+        function loadExample() {
+            document.getElementById('xml-input').value = defaultXML;
+            loadXML(defaultXML);
+        }
+
+        // Загрузка из файла
+        document.getElementById('fileInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('xml-input').value = e.target.result;
+                    loadXML(e.target.result);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Функции управления просмотром
+        function zoomIn() {
+            const canvas = viewer.get('canvas');
+            const zoom = canvas.zoom();
+            canvas.zoom(zoom * 1.2);
+        }
+
+        function zoomOut() {
+            const canvas = viewer.get('canvas');
+            const zoom = canvas.zoom();
+            canvas.zoom(zoom * 0.8);
+        }
+
+        function fitViewport() {
+            viewer.get('canvas').zoom('fit-viewport');
+        }
+
+        function downloadSVG() {
+            viewer.saveSVG((err, svg) => {
+                if (err) {
+                    showMessage('Ошибка сохранения SVG: ' + err.message, 'error');
+                    return;
+                }
+
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'bpmn-diagram.svg';
+                a.click();
+                URL.revokeObjectURL(url);
+                showMessage('SVG файл сохранен!', 'success');
+            });
+        }
+
+        function downloadBPMN() {
+            viewer.saveXML({ format: true }, (err, xml) => {
+                if (err) {
+                    showMessage('Ошибка сохранения BPMN: ' + err.message, 'error');
+                    return;
+                }
+
+                const blob = new Blob([xml], { type: 'application/xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'bpmn-diagram.bpmn';
+                a.click();
+                URL.revokeObjectURL(url);
+                showMessage('BPMN файл сохранен!', 'success');
+            });
+        }
+
+        // Функция для показа сообщений
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = text;
+            messageDiv.className = type;
+
+            // Автоматически скрываем успешные сообщения через 3 секунды
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                    messageDiv.className = '';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+
+</html>

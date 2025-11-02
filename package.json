@@ -1,0 +1,17 @@
+{
+  "name": "bpmn-creator",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bpmn-moddle": "^9.0.4",
+    "express": "^5.1.0"
+  }
+}
