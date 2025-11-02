@@ -4,15 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPMN Viewer</title>
+    <title>BPMN Editor</title>
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@9.4.0/dist/assets/diagram-js.css">
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@9.4.0/dist/assets/bpmn-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@9.4.0/dist/assets/bpmn-js-properties-panel.css">
     <style>
         #bpmn-container {
             width: 100%;
             height: 60vh;
             border: 1px solid #ccc;
             margin: 10px 0;
+            position: relative;
+        }
+
+        #properties-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: #f8f8f8;
+            border-left: 1px solid #ccc;
+            overflow-y: auto;
+            display: none;
+            z-index: 10;
+        }
+
+        .edit-mode {
+            background: #e8f4fd;
+            border: 1px solid #007acc;
         }
 
         body {
@@ -95,7 +115,7 @@
 </head>
 
 <body>
-    <h1>BPMN Viewer</h1>
+    <h1>BPMN Editor</h1>
 
     <!-- Табы для переключения между способами загрузки -->
     <div class="tab">
@@ -123,22 +143,29 @@
 
     <!-- Элементы управления -->
     <div class="controls">
+        <button id="edit-toggle" onclick="toggleEditMode()">Режим редактирования</button>
         <button onclick="zoomIn()">Увеличить (+)</button>
         <button onclick="zoomOut()">Уменьшить (-)</button>
         <button onclick="fitViewport()">Подогнать по размеру</button>
         <button onclick="downloadSVG()">Скачать как SVG</button>
         <button onclick="downloadBPMN()">Скачать как BPMN</button>
+        <button onclick="saveChanges()" id="save-btn" style="display: none;">Сохранить изменения</button>
     </div>
 
     <!-- Контейнер для BPMN -->
-    <div id="bpmn-container"></div>
+    <div id="bpmn-container">
+        <div id="properties-panel"></div>
+    </div>
 
     <!-- Подключаем библиотеки -->
-    <script src="https://unpkg.com/bpmn-js@9.4.0/dist/bpmn-viewer.development.js"></script>
+    <script src="https://unpkg.com/bpmn-js@9.4.0/dist/bpmn-modeler.development.js"></script>
+    <script src="https://unpkg.com/bpmn-js-properties-panel@0.20.0/dist/bpmn-js-properties-panel.umd.js"></script>
 
     <script>
-        // Инициализация BPMN viewer
+        // Инициализация BPMN viewer/modeler
         let viewer;
+        let isEditMode = false;
+        let originalXML = '';
 
         // Инициализация с проверкой доступности библиотеки
         function initializeViewer() {
@@ -149,7 +176,13 @@
 
             try {
                 viewer = new BpmnJS({
-                    container: '#bpmn-container'
+                    container: '#bpmn-container',
+                    propertiesPanel: {
+                        parent: '#properties-panel'
+                    },
+                    keyboard: {
+                        bindTo: window
+                    }
                 });
                 return true;
             } catch (error) {
@@ -259,6 +292,7 @@
 
             viewer.importXML(xml)
                 .then(() => {
+                    originalXML = xml;
                     showMessage('BPMN диаграмма успешно загружена!', 'success');
                     fitViewport();
                 })
@@ -354,6 +388,51 @@
                 a.click();
                 URL.revokeObjectURL(url);
                 showMessage('BPMN файл сохранен!', 'success');
+            });
+        }
+
+        // Переключение режима редактирования
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const editBtn = document.getElementById('edit-toggle');
+            const saveBtn = document.getElementById('save-btn');
+            const container = document.getElementById('bpmn-container');
+            const propertiesPanel = document.getElementById('properties-panel');
+
+            if (isEditMode) {
+                editBtn.textContent = 'Режим просмотра';
+                editBtn.classList.add('edit-mode');
+                saveBtn.style.display = 'inline-block';
+                container.classList.add('edit-mode');
+                propertiesPanel.style.display = 'block';
+                showMessage('Режим редактирования включен', 'info');
+            } else {
+                editBtn.textContent = 'Режим редактирования';
+                editBtn.classList.remove('edit-mode');
+                saveBtn.style.display = 'none';
+                container.classList.remove('edit-mode');
+                propertiesPanel.style.display = 'none';
+                showMessage('Режим просмотра включен', 'info');
+            }
+        }
+
+        // Сохранение изменений
+        function saveChanges() {
+            if (!viewer) {
+                showMessage('BPMN viewer не инициализирован', 'error');
+                return;
+            }
+
+            viewer.saveXML({ format: true }, (err, xml) => {
+                if (err) {
+                    showMessage('Ошибка сохранения BPMN: ' + err.message, 'error');
+                    return;
+                }
+
+                // Обновляем textarea с новым XML
+                document.getElementById('xml-input').value = xml;
+                originalXML = xml;
+                showMessage('Изменения сохранены в текстовом поле', 'success');
             });
         }
 
