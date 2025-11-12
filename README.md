@@ -106,7 +106,7 @@ bpmn-creator/
 ├── package.json            # Project configuration and dependencies
 ├── package-lock.json       # Locked dependency versions
 ├── .gitattributes          # Git attributes
-├── LICENSE                 # ISC license
+├── LICENSE                 # MIT license
 └── README.md               # Project documentation
 ```
 
@@ -146,7 +146,7 @@ Endpoint for generating BPMN (extendable)
 
 ## 📄 License
 
-This project is released under the ISC license. See the `LICENSE` file for details.
+This project is released under the MIT license. See the `LICENSE` file for details.
 
 ## 🐛 Known Issues
 
