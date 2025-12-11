@@ -54,6 +54,15 @@ coverage/
 # Logs
 logs/
 
+# Python environment
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.coverage
+.venv/
+.ipynb_checkpoints/
+
 # IDE
 .idea/
 .vscode/
