@@ -1,6 +1,6 @@
-# Easy XML-to-BPMN Creator
+# Vibe BPMN Studio
 
-A web application for creating, viewing, and editing BPMN diagrams (Business Process Model and Notation).
+A modern web application for creating, viewing, and editing BPMN diagrams (Business Process Model and Notation) with AI-powered assistant.
 
 ## 📋 Description
 
@@ -9,26 +9,29 @@ BPMN Creator offers a user‑friendly web interface for working with BPMN diagra
 ## ✨ Features
 
 - 🎨 **Diagram Creation**: Intuitive editor with a palette of elements
+- 🤖 **AI Assistant**: Chat-based BPMN generation and editing help
 - 📖 **Diagram Viewing**: Quick preview of BPMN diagrams with zoom capabilities
-- 📁 **Data Import**: Upload diagrams from a text field or files (.bpmn, .xml)
+- 📁 **Data Import**: Upload diagrams from files (.bpmn, .xml) or load examples
 - 💾 **Export**: Save diagrams in SVG and BPMN formats
 - 🔄 **Modes**: Switch between view and edit modes
 - 🖱️ **Navigation**: Zoom, fit‑to‑screen, and pan functionality
 - 📱 **Responsive Design**: Adaptive interface for all devices
+- 🎭 **Modern UI**: Clean, professional interface with dark theme code editor
 
 ## 🛠️ Technologies
 
-- **Backend**: Node.js, Express.js
+- **Backend**: Python, FastAPI, Uvicorn
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **BPMN Library**: bpmn-js v9.4.0
-- **Styling**: Built‑in CSS styles
+- **BPMN Library**: bpmn-js v14.0.0
+- **Styling**: Modern CSS with Custom Properties
+- **Package Manager**: UV (modern Python package manager)
 
 ## 📦 Installation and Setup
 
 ### Prerequisites
 
-- Node.js (version 16 or higher)
-- npm or yarn
+- Python 3.13 or higher
+- UV package manager (recommended) or pip
 
 ### Installation Steps
 
@@ -39,53 +42,64 @@ BPMN Creator offers a user‑friendly web interface for working with BPMN diagra
    cd bpmn-creator
    ```
 
-2. **Install dependencies**:
+2. **Install dependencies with UV**:
 
    ```bash
-   npm install
+   uv sync
+   ```
+
+   Or with pip:
+
+   ```bash
+   pip install -e .
    ```
 
 3. **Start the server**:
 
+   With uvicorn directly:
+
    ```bash
-   npm start
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
 4. **Open the application**:
-   Navigate to `http://localhost:3000` in your browser.
+   Navigate to `http://localhost:8000` in your browser.
 
 ## 🚀 Usage
 
 ### Core Functions
 
-#### 1. Diagram Upload
+#### 1. Working with AI Assistant
 
-**From Text:**
+- Navigate to **AI Ассистент** tab in the sidebar
+- Type your request in natural language (e.g., "Add task 'Review Document'")
+- AI will help generate and modify BPMN diagrams
+- Example: "Create a process with start event, approval task, and end event"
 
-- Paste BPMN XML into the text field
-- Click **Load BPMN**
+#### 2. Diagram Upload
 
 **From File:**
 
-- Switch to the **Load from File** tab
-- Select a file with a .bpmn or .xml extension
+- Click **Открыть** button in the toolbar
+- Select a .bpmn or .xml file
+- Diagram will load automatically
 
-#### 2. Editing
+**From XML Editor:**
 
-- Click **Edit Mode** to activate the element palette
-- Use left‑side elements to create new components
-- Click **Save Changes** to update the XML
+- Navigate to **XML** tab in the sidebar
+- Paste BPMN XML into the code editor
+- Click **Применить** to load the diagram
 
-#### 3. Viewing
+#### 3. Editing
 
-- Use zoom buttons to increase/decrease view
-- **Fit to Screen** automatically adjusts the zoom level
-- Drag the diagram for navigation
+- Use the toolbar buttons for zoom controls
+- The interface supports both view and edit modes
+- Changes are reflected in real-time
 
 #### 4. Export
 
-- **SVG**: Download vector image
-- **BPMN**: Save as BPMN format for further editing
+- **Скачать .bpmn**: Save as BPMN format for further editing
+- **Скачать .svg**: Download as vector image for presentations
 
 ### Example BPMN
 
@@ -100,11 +114,27 @@ The application loads with a sample diagram that includes:
 
 ```
 bpmn-creator/
-├── public/                 # Static assets (empty folder)
-├── server.js               # Express server
-├── viewer.html             # Main application interface
-├── package.json            # Project configuration and dependencies
-├── package-lock.json       # Locked dependency versions
+├── src/                    # Python source code
+│   ├── api_routes.py       # FastAPI routes
+│   ├── get_example_diagram.py  # Example diagram loader
+│   └── schemas.py          # Pydantic schemas
+├── static/                 # Frontend assets
+│   ├── index.html          # Main application interface
+│   ├── css/
+│   │   └── style.css       # Modern styling
+│   └── js/                 # JavaScript modules
+│       ├── app.js          # Main application logic
+│       ├── bpmn-viewer.js  # BPMN viewer management
+│       ├── bpmn-controls.js # File operations
+│       ├── bot-responder.js # AI assistant logic
+│       └── ui-manager.js   # UI management
+├── data/                   # Data files
+│   └── XMLs/
+│       └── base_bpmn_diagram.xml  # Default BPMN template
+├── main.py                 # FastAPI application entry point
+├── pyproject.toml          # Python project configuration
+├── uv.lock                 # UV package manager lock file
+├── .python-version         # Python version specification
 ├── .gitattributes          # Git attributes
 ├── LICENSE                 # MIT license
 └── README.md               # Project documentation
@@ -130,18 +160,45 @@ bpmn-creator/
 
 ### GET /
 
-Main application page
+Main application page serving the React interface
 
-### GET /api/generate-bpmn
+### GET /health
 
-Endpoint for generating BPMN (extendable)
+Health check endpoint
 
-- **Response**: JSON object with status information
+- **Response**: `{"status": "OK"}`
+
+### GET /api/example-bpmn-xml
+
+Get the base BPMN XML structure
+
+- **Response**: `{"xml": "<bpmn:definitions>..."}`
+
+### POST /api/generate
+
+Generate BPMN XML code (extendable)
+
+- **Response**: JSON object with generation status
+- **Note**: Currently returns placeholder, ready for AI integration
 
 ## 📋 Scripts
 
-- `npm start` – Launch development server
-- `npm test` – Run tests (not configured)
+### Development
+
+- `python main.py` – Launch development server
+- `uvicorn main:app --reload` – Launch with auto-reload
+- `uvicorn main:app --reload --host 0.0.0.0 --port 8000` – Launch for external access
+
+### Package Management
+
+- `uv sync` – Install/update dependencies
+- `uv add <package>` – Add new dependency
+- `uv remove <package>` – Remove dependency
+
+### Testing
+
+- `pytest` – Run tests (to be implemented)
+- `python -m pytest` – Alternative test command
 
 ## 🎯 Expansion Possibilities
 
@@ -181,10 +238,11 @@ If you have questions or suggestions:
 ## 🙏 Acknowledgements
 
 - [bpmn.io](https://bpmn.io/) – for the excellent BPMN library
-- [Express.js](https://expressjs.com/) – for the robust web framework
+- [FastAPI](https://fastapi.tiangolo.com/) – for the modern Python web framework
+- [UV](https://docs.astral.sh/uv/) – for the fast Python package manager
 - The open‑source community for inspiration
 
 ---
 
-**Version**: 0.0.3
-**Last Updated**: November 2025
+**Version**: 0.1.0
+**Last Updated**: December 2025

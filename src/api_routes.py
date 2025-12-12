@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from fastapi import APIRouter
-from .get_example_diagram import get_example_diagramm
+from src.get_example_diagram import get_example_diagramm
 from .schemas import SExampleBPMN
 
 router = APIRouter(
@@ -16,6 +16,7 @@ async def generate_bpmn():
     """
     Generate BPMN XML code to render with bpmn-js
     """
+    # TODO for future realization
     return {"message": "BPMN generation endpoint"}
 
 
