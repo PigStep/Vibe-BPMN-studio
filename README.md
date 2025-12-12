@@ -228,6 +228,16 @@ This project is released under the MIT license. See the `LICENSE` file for detai
 - No built‑in server‑side persistence
 - Visualization of complex BPMN diagrams can be cumbersome due to limited zoom and panning controls
 
+## TO-DO's
+
+- [x] Implement BPMN creating from XML-code
+- [ ] Implement AI assistant diagramm creation
+- [ ] Implement AI assistant diagramm editing
+- [ ] Implement XML code validation
+- [ ] Implement database persistence
+- [ ] Add support for additional file formats (PNG, PDF)
+- [ ] Implement real‑time collaborative editing
+
 ## 📞 Support
 
 If you have questions or suggestions:
