@@ -112,7 +112,7 @@ The application loads with a sample diagram that includes:
 
 ## 📁 Project Structure
 
-```
+```bash
 bpmn-creator/
 ├── src/                    # Python source code
 │   ├── api_routes.py       # FastAPI routes
@@ -142,6 +142,7 @@ bpmn-creator/
 
 ## 🏗️ Arhitecture
 
+```bash
 ┌─────────────────────────────────────┐
 │  Frontend (bpmn-js)                 │
 │  - BPMN vizualization               │
@@ -155,6 +156,7 @@ bpmn-creator/
 │  - AI XML code generation           │
 │  - Validation and transforming      │
 └─────────────────────────────────────┘
+```
 
 ## 🔧 API Endpoints
 
