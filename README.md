@@ -35,6 +35,8 @@ BPMN Creator offers a user‑friendly web interface for working with BPMN diagra
 
 ### Installation Steps
 
+#### Cloning the Repository
+
 1. **Clone the repository**:
 
    ```bash
@@ -64,6 +66,27 @@ BPMN Creator offers a user‑friendly web interface for working with BPMN diagra
 
 4. **Open the application**:
    Navigate to `http://localhost:8000` in your browser.
+
+#### 🐳 Docker (Recommended + Fast way)
+
+Alternatively, you can run the application using Docker:
+
+1. **Pull the Docker image**:
+
+   ```bash
+   docker pull pigstep/vibe-bpmn:latest
+   ```
+
+2. **Run the container**:
+
+   ```bash
+   docker run -d -p 8000:8000 --name bpmn-creator pigstep/vibe-bpmn:latest
+   ```
+
+3. **Access the application**:
+   Open `http://localhost:8000` in your browser.
+
+**Docker Hub**: The image is available at `docker push pigstep/vibe-bpmn:tagname`
 
 ## 🚀 Usage
 
