@@ -1,11 +1,13 @@
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+from settings import get_settings
 
-load_dotenv()  # FIXME допиши потом setttings
+settings = get_settings()
 
 
-AI_API_KEY = os.environ["OPEN_ROUTER_API_KEY"]
+AI_API_KEY = settings.OPENROUTER_API_KEY
+MODEL_NAME = settings.OPENROUTER_MODEL_NAME
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
@@ -18,7 +20,7 @@ completion = client.chat.completions.create(
         "X-Title": "<YOUR_SITE_NAME>",  # Optional. Site title for rankings on openrouter.ai.
     },
     extra_body={},
-    model="tngtech/deepseek-r1t2-chimera:free",
+    model=MODEL_NAME,
     messages=[{"role": "user", "content": "What is the meaning of life?"}],
     stream=True,
 )

@@ -66,3 +66,7 @@ __pycache__/
 # IDE
 .idea/
 .vscode/
+
+# dev testing code
+test.ipynb
+test.py

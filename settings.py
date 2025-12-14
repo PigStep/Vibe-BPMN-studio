@@ -1,56 +1,55 @@
 import os
 from pydantic import (
-    BaseSettings,
-    SettingsConfigDict,
     field_validator,
     Field,
     model_validator,
 )
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from enum import Enum
 
 
 class Environment(str, Enum):
-    DEVELOPMENT = "dev"
-    PRODUCTION = "prod"
-    TESTING = "test"
+    DEV = "dev"
+    PROD = "prod"
+    TEST = "test"
 
 
 class Settings(BaseSettings):
     """Settings for the application"""
 
-    environment: Environment = Field(
+    ENVIROMENT: Environment = Field(
         default=Environment.DEV,
         description="Environment setting (dev, prod, test)",
     )
 
     # ==== OPEN ROUTER ====
-    openrouter_api_key: str = Field(
+    OPENROUTER_API_KEY: str = Field(
         ...,
         description="OpenRouter API key",
         min_length=10,
     )
-    openrouter_model_name: str = Field(
+    OPENROUTER_MODEL_NAME: str = Field(
         ...,
         description="OpenRouter model name",
     )
 
     # ==== SITE ====
-    your_site_url: str = Field(
+    SITE_URL: str = Field(
         default="https://site_url_default.com",
         description="Site URL for rankings on openrouter.ai.",
     )
-    your_site_name: str = Field(
+    SITE_NAME: str = Field(
         default="Default site name",
         description="Site title for rankings on openrouter.ai.",
     )
 
     # ==== OTHER ====
-    debug: bool = Field(default=False, description="Debug mode")
+    DEBUG_MODE: bool = Field(default=False, description="Debug mode")
 
-    log_level: str = Field(default="INFO", description="Logging level")
+    LOG_LEVEL: str = Field(default="INFO", description="Logging level")
 
     # === VALIDATORS ===
-    @field_validator("log_level")
+    @field_validator("LOG_LEVEL")
     @classmethod
     def validate_log_level(cls, v):
         """Validate the correctness of the log level"""
@@ -59,7 +58,7 @@ class Settings(BaseSettings):
             raise ValueError(f"log_level must be one of: {', '.join(allowed)}")
         return v.upper()
 
-    @field_validator("environment", mode="before")
+    @field_validator("ENVIROMENT", mode="before")
     @classmethod
     def validate_environment(cls, v):
         """Convert a string to an Environment enum"""
@@ -74,27 +73,27 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def set_environment_defaults(self):
         """Set default values based on the environment"""
-        if self.environment == Environment.PROD:
-            self.debug = False  # Always False in production
-            if self.log_level == "DEBUG":
-                self.log_level = "INFO"  # Minimum INFO in production
+        if self.ENVIROMENT == Environment.PROD:
+            self.DEBUG_MODE = False  # Always False in production
+            if self.LOG_LEVEL == "DEBUG":
+                self.LOG_LEVEL = "INFO"  # Minimum INFO in production
         return self
 
     # === PROPERTIES ====
     @property
     def is_dev(self) -> bool:
         """Check if environment is dev"""
-        return self.environment == Environment.DEV
+        return self.ENVIROMENT == Environment.DEV
 
     @property
     def is_prod(self) -> bool:
         """Check if environment is prod"""
-        return self.environment == Environment.PROD
+        return self.ENVIROMENT == Environment.PROD
 
     @property
     def is_test(self) -> bool:
         """Check if environment is test"""
-        return self.environment == Environment.TEST
+        return self.ENVIROMENT == Environment.TEST
 
     model_config = SettingsConfigDict(
         env_file=(
