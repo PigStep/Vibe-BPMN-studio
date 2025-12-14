@@ -1,0 +1,35 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "participants"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "participants": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "processRef"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "processRef": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

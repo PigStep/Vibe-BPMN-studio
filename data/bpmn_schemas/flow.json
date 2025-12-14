@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "required": [
+        "flows"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "flows": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "sourceRef",
+                    "targetRef"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "sourceRef": {
+                        "type": "string"
+                    },
+                    "targetRef": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

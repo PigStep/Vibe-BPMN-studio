@@ -6,3 +6,8 @@ __pycache__
 
 .env
 .env.example
+
+.ipnyb
+.ipynb_checkpoints
+
+\data\XMLs\test_schemas

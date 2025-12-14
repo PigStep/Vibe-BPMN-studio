@@ -1,0 +1,48 @@
+{
+    "type": "object",
+    "required": [
+        "positions"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "positions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "elementId",
+                    "bounds"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "elementId": {
+                        "type": "string"
+                    },
+                    "bounds": {
+                        "type": "object",
+                        "required": [
+                            "x",
+                            "y",
+                            "width",
+                            "height"
+                        ],
+                        "properties": {
+                            "x": {
+                                "type": "number"
+                            },
+                            "y": {
+                                "type": "number"
+                            },
+                            "width": {
+                                "type": "number"
+                            },
+                            "height": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

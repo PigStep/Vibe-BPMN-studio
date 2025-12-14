@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "required": [
+        "errorType",
+        "message",
+        "context"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "errorType": {
+            "type": "string",
+            "enum": [
+                "missing_node",
+                "invalid_reference",
+                "dangling_flow",
+                "no_start_event",
+                "no_end_event"
+            ]
+        },
+        "message": {
+            "type": "string"
+        },
+        "context": {
+            "type": "object",
+            "additionalProperties": true
+        }
+    }
+}

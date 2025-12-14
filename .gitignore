@@ -70,3 +70,4 @@ __pycache__/
 # dev testing code
 test.ipynb
 test.py
+data\XMLs\test_schemas
