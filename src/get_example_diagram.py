@@ -13,11 +13,10 @@ def get_example_diagramm():
         with open(XML_BASE_BPMN_PATH, encoding="utf-8", mode="r") as f:
             return f.read()
     except FileNotFoundError as e:
-        logger.error(f"Файл {XML_BASE_BPMN_PATH} не найден")
+        logger.error("File {} not found: {}".format(XML_BASE_BPMN_PATH, e))
         return "<error>File not found</error>"
-
     except Exception as e:
         logger.error(
-            f"Непредвиденная ошибка при чтении файла {XML_BASE_BPMN_PATH}: {e}"
+            "Unexpected error while reading file {}: {}".format(XML_BASE_BPMN_PATH, e)
         )
         return "<error>Unknown error</error>"

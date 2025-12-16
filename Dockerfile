@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install uv
+RUN pip install --no-cache-dir uv
 RUN uv sync
 
 

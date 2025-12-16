@@ -29,6 +29,6 @@ async def get_example_bpmn_xml() -> SExampleBPMN:
     try:
         xml = await asyncio.to_thread(get_example_diagramm)
     except Exception as e:
-        logger.error(f"Error getting example BPMN XML: {e}")
+        logger.error("Error getting example BPMN XML: " + str(e))
         return {"error": str(e)}
     return {"xml": xml}
