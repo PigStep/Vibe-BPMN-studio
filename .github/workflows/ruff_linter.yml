@@ -1,0 +1,34 @@
+name: Python Linting (Ruff)
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - run: pip install --upgrade pip ruff
+
+    - name: Ruff lint (SARIF)
+      run: ruff check . --output-format sarif > ruff.sarif || true
+
+    - name: Fail CI on Ruff issues
+      run: |
+        ruff check .
+        ruff format --check .
+
+    - name: Upload Ruff SARIF
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ruff.sarif
+
