@@ -1,4 +1,4 @@
-name: CI: Build Docker container
+name: Build Docker container
 
 on:
 push:
@@ -12,7 +12,6 @@ env:
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.tag.outputs.value }}
