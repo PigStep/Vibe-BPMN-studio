@@ -1,3 +1,5 @@
+[![GitHub Registry](https://img.shields.io/badge/GitHub%20Registry-grey?style=flat&logo=github&logoColor=white)](https://github.com/PigStep/vibe-bpmn/pkgs/container/vibe-bpmn)
+
 # Vibe BPMN Studio
 
 A modern web application for creating, viewing, and editing BPMN diagrams (Business Process Model and Notation) with AI-powered assistant.
@@ -74,19 +76,19 @@ Alternatively, you can run the application using Docker:
 1. **Pull the Docker image**:
 
    ```bash
-   docker pull pigstep/vibe-bpmn:latest
+   docker pull ghcr.io/pigstep/vibe-bpmn:latest
    ```
 
 2. **Run the container**:
 
    ```bash
-   docker run -d -p 8000:8000 --name bpmn-creator pigstep/vibe-bpmn:latest
+   docker run -d -p 8000:8000 --name bpmn-creator ghcr.io/pigstep/vibe-bpmn:latest
    ```
 
 3. **Access the application**:
    Open `http://localhost:8000` in your browser.
 
-**Docker Hub**: The image is available at `docker push pigstep/vibe-bpmn:tagname`
+**GitHub Registry**: The image is available at [ghcr.io/pigstep/vibe-bpmn](https://github.com/PigStep/vibe-bpmn/pkgs/container/vibe-bpmn)
 
 ## 🚀 Usage
 
