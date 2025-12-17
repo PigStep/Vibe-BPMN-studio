@@ -2,7 +2,7 @@ name: CI: build & checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [ "main" ]
 
 env:
   IMAGE_NAME: vibe-bpmn

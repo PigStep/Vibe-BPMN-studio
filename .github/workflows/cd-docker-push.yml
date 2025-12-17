@@ -2,7 +2,7 @@ name: CD: build & push image
 
 on:
   push:
-    branches: [main]
+    branches: [ "main" ]
 
 env:
   IMAGE_NAME: vibe-bpmn
