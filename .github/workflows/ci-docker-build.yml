@@ -31,6 +31,7 @@ jobs:
           context: .
           push: true
           tags: |
+            ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:ci-{{ github.sha [0:7]}
             ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:ci-latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
