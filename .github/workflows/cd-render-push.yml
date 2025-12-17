@@ -1,0 +1,19 @@
+name: CD - render & push
+on:
+  workflow_run:
+    workflows: ["CD - build & push image"]
+    branches: [main] 
+    types:
+      - completed
+    types:
+      - completed
+
+jobs:
+  deploy-render:
+      if: ${{ github.event.workflow_run.conclusion == 'success' }}
+      runs-on: ubuntu-latest
+      steps:
+        - name: Trigger Render Deployment
+          run: |
+            # Если curl вернет ошибку — job упадет, и мы узнаем о проблеме
+            curl -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
