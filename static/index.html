@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/static/images/favicon_64.ico" type="image/x-icon">
     <title>Vibe BPMN Editor AI powered</title>
 
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@14.0.0/dist/assets/diagram-js.css" />
@@ -17,9 +16,7 @@
 <body>
     <header class="app-header">
         <div class="logo">
-            <img src="/static/images/favicon_256.ico" alt="favicon"
-                style="height:2em;vertical-align:middle;margin-right:4px;">
-            Vibe BPMN Studio
+            <i class="fas fa-project-diagram"></i> Vibe BPMN Studio
         </div>
         <div class="toolbar">
             <input type="file" id="file-input" accept=".bpmn,.xml" hidden>
@@ -83,7 +80,6 @@
     <script src="https://unpkg.com/bpmn-js@14.0.0/dist/bpmn-modeler.development.js"></script>
 
     <!-- Подключаем все необходимые скрипты в правильном порядке -->
-    <script src="/static/js/config.js"></script>
     <script src="/static/js/bpmn-viewer.js"></script>
     <script src="/static/js/bpmn-controls.js"></script>
     <script src="/static/js/ui-manager.js"></script>

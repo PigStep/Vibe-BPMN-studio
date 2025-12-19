@@ -1,13 +1,13 @@
 /**
- * UI management
+ * Управление UI элементами
  */
 class UIManager {
     constructor() {
-        // Removed message banner
+        // Убрана плашка сообщений
     }
 
-    // Methods for future extensions
+    // Методы для будущих расширений
     showTab(tabName) {
-        // Keep for compatibility
+        // Можно оставить для совместимости
     }
 }
