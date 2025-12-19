@@ -1,10 +1,11 @@
+import config from "./config";
 /**
  * Manage save and load operations
  */
 class BPMNControls {
     constructor(viewer) {
         this.viewer = viewer;
-        this.apiUrl = 'http://127.0.0.1:8000/api';
+        this.apiUrl = config.API_URL;
     }
 
     async loadExampleFromServer() {

@@ -34,9 +34,12 @@ class Settings(BaseSettings):
     )
 
     # ==== SITE ====
-    SITE_URL: str = Field(
-        default="https://site_url_default.com",
-        description="Site URL for rankings on openrouter.ai.",
+    BASE_URL: str = Field(
+        default="http://127.0.0.1:8000/",
+        description="Your site base URL",
+    )
+    API_URL: str = Field(
+        default="http://127.0.0.1:8000/api/", description="Your site API URL"
     )
     SITE_NAME: str = Field(
         default="Default site name",
