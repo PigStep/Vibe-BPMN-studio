@@ -1,17 +1,44 @@
 name: CD - render & push
+
+permissions:
+  contents: read
+  actions: read
+  workflows: read
+
 on:
   workflow_run:
     workflows: ["CD - build & push image"]
     branches: [main] 
     types:
       - completed
-
+  workflow_dispatch:  # Manual trigger
 jobs:
   deploy-render:
       if: ${{ github.event.workflow_run.conclusion == 'success' }}
       runs-on: ubuntu-latest
       steps:
+        - name: Debug info
+          run: |
+            echo "Workflow triggered by: ${{ github.event.workflow_run.name }}"
+            echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
+            echo "Head branch: ${{ github.event.workflow_run.head_branch }}"
+            
         - name: Trigger Render Deployment
           run: |
-            # Если curl вернет ошибку — job упадет, и мы узнаем о проблеме
+            # If curl returns an error, the job will fail and we will know about the problem
+            curl -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+  deploy-render-manual:
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      runs-on: ubuntu-latest
+      steps:
+        - name: Manual deployment info
+          run: |
+            echo "Manual deployment triggered"
+            echo "Triggered by: ${{ github.actor }}"
+            echo "Branch: ${{ github.ref_name }}"
+            
+        - name: Trigger Render Deployment (Manual)
+          run: |
+            echo "Starting manual deployment..."
             curl -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
