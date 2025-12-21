@@ -25,5 +25,4 @@ jobs:
           
       - name: Trigger Render Deployment
         run: |
-          # Флаг -f заставит curl упасть с ошибкой, если Render вернет ошибку
           curl -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
