@@ -3,11 +3,10 @@ name: CD - render & push
 permissions:
   contents: read
   actions: read
-  workflows: read
 
 on:
   workflow_run:
-    workflows: ["CD - build & push image"]
+    workflows: ["CD - build & push docker image"]
     branches: [main]
     types:
       - completed

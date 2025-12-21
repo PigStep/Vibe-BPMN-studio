@@ -1,4 +1,4 @@
-name: CD - build & push image
+name: CD - build & push docker image
 
 on:
   pull_request:
