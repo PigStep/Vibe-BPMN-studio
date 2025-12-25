@@ -29,8 +29,7 @@ class BpmnDirector:
                 )
 
     def _handle_process(self, data: Dict[str, Any]) -> str:
-        print(data)  # FIXME
-        if proc_data := data.get("Process"):
+        if proc_data := data.get("process"):
             self.builder.start_process(proc_data["id"], proc_data.get("name"))
             for node in proc_data.get("nodes", []):
                 self.builder.add_node(
