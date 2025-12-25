@@ -5,6 +5,12 @@
     ],
     "additionalProperties": false,
     "properties": {
+        "schema_name": {
+            "type": "string",
+            "enum": [
+                "flows"
+            ]
+        },
         "flows": {
             "type": "array",
             "minItems": 1,

@@ -7,6 +7,12 @@
     ],
     "additionalProperties": false,
     "properties": {
+        "schema_name": {
+            "type": "string",
+            "enum": [
+                "validation"
+            ]
+        },
         "errorType": {
             "type": "string",
             "enum": [

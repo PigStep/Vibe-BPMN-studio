@@ -6,6 +6,12 @@
     ],
     "additionalProperties": false,
     "properties": {
+        "schema_name": {
+            "type": "string",
+            "enum": [
+                "plan"
+            ]
+        },
         "intent": {
             "type": "string",
             "enum": [

@@ -5,6 +5,12 @@
     ],
     "additionalProperties": false,
     "properties": {
+        "schema_name": {
+            "type": "string",
+            "enum": [
+                "diagramm"
+            ]
+        },
         "elements": {
             "type": "array",
             "items": {
