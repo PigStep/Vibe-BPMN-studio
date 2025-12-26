@@ -9,14 +9,14 @@ MODEL_NAME = settings.OPENROUTER_MODEL_NAME
 
 
 class LLMClient:
-    def __init__(self, client: OpenAI, model_name: str, behaivour_promt: str):
+    def __init__(self, client: OpenAI, model_name: str):
         self.client = client
         self.model_name = model_name
-        self.behaivour_promt = behaivour_promt
 
     def _generate_response(
         self,
         prompt: str,
+        system_prompt: str,
         response_format: dict | None = None,
         extra_body: dict | None = None,
     ) -> str | None:
@@ -26,31 +26,36 @@ class LLMClient:
         Parameters
         ----------
         prompt : str
-            The user prompt to send to the model.
+            User prompt to be sent to the model.
+        system_prompt : str | None, optional
+            Additional system prompt that will replace the base system prompt.
         response_format : dict | None, optional
-            The format for the model's response
-            ```{
-            "type": "json_schema",
-            "json_schema": {
-                "name": "response_schema",
-                "schema": json_schema,
+            Response format specification. Example:
+            ```
+            {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "response_schema",
+                    "schema": json_schema,
+                }
             }
             ```
-
         extra_body : dict | None, optional
-            Additional key/value pairs to include in the request body (e.g reasoning effort)
-            ```
-            extra_body={"reasoning": {"effort": reasoning_mode}}
-            ```
+            Additional key/value pairs to be included in the request body.
+            Example: {'reasoning': {'effort': 'high'}}.
+
         Returns
         -------
         str | None
-            The content of the first message in the model's response, or None if no content is returned.
+            Content of the first message in the model's response, or None if no content is present.
         """
         response = self.client.chat.completions.create(
             model=self.model_name,
             messages=[
-                {"role": "system", "content": self.behaivour_promt},
+                {
+                    "role": "system",
+                    "content": system_prompt,
+                },
                 {"role": "user", "content": prompt},
             ],
             response_format=response_format if response_format else None,
@@ -62,6 +67,7 @@ class LLMClient:
         self,
         prompt: str,
         json_schema: dict,
+        system_promt: str,
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
     ) -> str | None:
         """
@@ -73,6 +79,8 @@ class LLMClient:
             The user prompt to be sent to the model.
         json_schema : dict
             A JSON Schema dict that defines the expected structure of the model's output.
+        system_promt : str | None, optional
+            Optional system prompt to supplement the user's message.
         reasoning_mode : Literal["none", "minimal", "low", "medium", "high"], optional
             The level of reasoning effort the model should apply when generating the response.
             Defaults to "none".
@@ -92,6 +100,7 @@ class LLMClient:
                 },
             },
             extra_body={"reasoning": {"effort": reasoning_mode}},
+            system_prompt=system_promt,
         )
 
     def generate_response_text_based(

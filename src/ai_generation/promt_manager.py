@@ -14,15 +14,6 @@ class PromptManager:
     def __init__(self, prompt_dir: str = r"data/prompts"):
         self.prompt_dir = Path(prompt_dir)
 
-    @lru_cache(maxsize=32)
-    def _load_yaml(file_path: Path) -> dict:
-        try:
-            with open(file_path, "r", encoding="utf-8") as file:
-                return yaml.safe_load(file) or {}
-        except Exception as e:
-            logger.error(f"Failed to load YAML at {file_path}: {e}")
-            return {}
-
     def get_prompt(
         self,
         prompt_name: str,
@@ -66,6 +57,16 @@ class PromptManager:
 
         template = Template(raw_template)
         return template.render(**kwargs)
+
+    @staticmethod
+    @lru_cache(maxsize=32)
+    def _load_yaml(file_path: Path) -> dict:
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                return yaml.safe_load(file) or {}
+        except Exception as e:
+            logger.error(f"Failed to load YAML at {file_path}: {e}")
+            return {}
 
 
 manager = PromptManager()

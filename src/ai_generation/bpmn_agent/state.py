@@ -11,7 +11,7 @@ MODEL_NAME = settings.OPENROUTER_MODEL_NAME
 
 raw_client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=AI_API_KEY)
 
-clientBpmn = LLMClient(raw_client, MODEL_NAME, "Ты полезный ассистент")
+clientBpmn = LLMClient(raw_client, MODEL_NAME)
 
 
 def getBpmnClient():

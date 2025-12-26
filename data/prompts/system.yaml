@@ -1,7 +1,7 @@
 name: "BPMN_Orchestrator"
 version: "1.0.0"
 config:
-  temperature: 0.2  # Low temperature for strict JSON
+  ...
 templates:
   system: |
     ### ROLE
