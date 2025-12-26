@@ -91,8 +91,9 @@ class LLMClient:
             The JSON response as a string if the model returns a valid response; otherwise, None.
         """
         return self._generate_response(
-            prompt,
-            {
+            prompt=prompt,
+            system_prompt=system_promt,
+            response_format={
                 "type": "json_schema",
                 "json_schema": {
                     "name": "response_schema",
@@ -100,7 +101,6 @@ class LLMClient:
                 },
             },
             extra_body={"reasoning": {"effort": reasoning_mode}},
-            system_prompt=system_promt,
         )
 
     def generate_response_text_based(

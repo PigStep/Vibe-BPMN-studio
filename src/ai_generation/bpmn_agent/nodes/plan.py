@@ -19,7 +19,7 @@ def plan(
 
     intent = state.get("messages")[0]  # First input
 
-    with open(r"data\bpmn_schemas\layout.json", "r", encoding="utf-8") as file:
+    with open(r"data\bpmn_schemas\plan.json", "r", encoding="utf-8") as file:
         json_schema = json.load(file)  # FIXME decompose
 
     system_promt = prompt_manager.get_prompt("plan", "system")
