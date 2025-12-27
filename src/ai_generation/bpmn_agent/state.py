@@ -1,3 +1,4 @@
+from typing import List
 from openai import OpenAI
 from typing_extensions import TypedDict, Annotated
 import operator
@@ -20,3 +21,5 @@ def getBpmnClient():
 
 class BPMNState(TypedDict):
     messages: Annotated[list[str], operator.add]
+    plan: List[dict]
+    execution_step: int

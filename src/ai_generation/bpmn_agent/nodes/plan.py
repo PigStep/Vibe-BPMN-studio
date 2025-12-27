@@ -37,4 +37,5 @@ def plan(
         logger.warning("Error while generating response. JSON is not valid")
         return state
 
-    return {**state, "messages": [response]}
+    plan = json.loads(response)["plan"]
+    return {**state, "messages": [response], "plan": plan}
