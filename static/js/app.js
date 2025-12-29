@@ -51,6 +51,20 @@
         });
     }
 
+    async function updateDiagram(xml) {
+        try {
+            // Update the text editor
+            document.getElementById('xml-editor').value = xml;
+
+            // Update the visual editor
+            await bpmnViewer.loadXML(xml);
+
+            console.log('Diagram updated from AI response');
+        } catch (error) {
+            console.error('Error updating diagram:', error);
+        }
+    }
+
     // Setup all event handlers
     function setupEventListeners() {
         // Load from file
@@ -60,8 +74,8 @@
 
             try {
                 const xml = await bpmnControls.loadFromFile(file);
-                document.getElementById('xml-editor').value = xml;
-                await bpmnViewer.loadXML(xml);
+                // Используем общую функцию обновления
+                await updateDiagram(xml);
             } catch (error) {
                 console.error('File read error:', error);
             }
@@ -129,13 +143,27 @@
             addMessage(text, true);
             chatInput.value = '';
 
-            // Используем BotResponder для генерации ответа
+            // Use BotResponder to generate a response
             try {
                 const botResponse = await botResponder.generateResponseAsync(text);
                 addMessage(botResponse);
+
+                // Try to find XML structure in the response
+                const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
+
+                if (xmlMatch) {
+                    const xmlContent = xmlMatch[0];
+                    // Clean up from Markdown formatting
+                    const cleanXml = xmlContent.replace(/^```xml\s*/, '').replace(/```$/, '');
+
+                    // Call update function
+                    await updateDiagram(cleanXml); // Используем cleanXml
+
+                    addMessage('<i>Diagram was automatically updated.</i>');
+                }
             } catch (error) {
                 console.error('Error generating bot response:', error);
-                addMessage('Извините, произошла ошибка при обработке вашего запроса.');
+                addMessage('Sorry, an error occurred while processing your request.');
             }
         });
 
@@ -144,5 +172,6 @@
                 sendChatBtn.click();
             }
         });
+
     }
 })();

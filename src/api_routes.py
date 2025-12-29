@@ -13,7 +13,7 @@ router = APIRouter(
 logger = logging.getLogger(__name__)
 
 
-@router.post("/generate")
+@router.get("/generate")
 async def generate_bpmn(user_data: SUserInputData) -> SAgentOutput:
     """
     Generate BPMN XML code to render with bpmn-js

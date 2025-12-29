@@ -1,25 +1,47 @@
 class BotResponder {
     /**
-     * Генерирует ответ бота на основе пользовательского сообщения
-     * @param {string} userMessage - Сообщение пользователя
-     * @returns {string} Ответ бота
+     * Generates bot response via API (asynchronously)
+     * @param {string} userMessage - User message
+     * @returns {Promise<string>} Response from server
      */
-    generateResponse(userMessage) {
-        // Простой ответ бота (можно заменить на AI интеграцию)
-        return `Получил ваш запрос: "${userMessage}". В будущем здесь будет интеграция с AI.`;
+    async generateResponse(userMessage) {
+        try {
+            // 1. Construct URL with parameters
+            // encodeURIComponent is important to avoid breaking URL with special characters
+            const queryParams = new URLSearchParams({
+                user_input: userMessage
+            });
+
+            const url = `/api/generate?${queryParams.toString()}`;
+
+            // 2. Perform GET request
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            // 3. Check if response is successful
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // 4. Retrieve data
+            const data = await response.json();
+
+            return data.output || JSON.stringify(data);
+
+        } catch (error) {
+            console.error('API error:', error);
+            return "Sorry, unable to connect to the server.";
+        }
     }
 
     /**
-     * Генерирует ответ с задержкой (асинхронно)
-     * @param {string} userMessage - Сообщение пользователя
-     * @param {number} delay - Задержка в миллисекундах
-     * @returns {Promise<string>} Promise с ответом бота
+     * Wrapper for compatibility with app.js.
      */
-    generateResponseAsync(userMessage, delay = 500) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(this.generateResponse(userMessage));
-            }, delay);
-        });
+    async generateResponseAsync(userMessage) {
+        return await this.generateResponse(userMessage);
     }
 }
