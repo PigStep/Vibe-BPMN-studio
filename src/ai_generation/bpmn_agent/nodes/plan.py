@@ -36,10 +36,10 @@ def plan(
     # get message
 
     intent = state.get("messages")[0]  # First input
-    system_promt = prompt_manager.get_prompt("plan", "system")
+    system_promt = prompt_manager.get_call_config("plan", "system")
     response = llm.generate_response_json_based(
         prompt=intent,
-        system_promt=system_promt,
+        system_prompt=system_promt,
         json_schema=schema_manager.get_schema("plan"),
     )
 
