@@ -1,4 +1,3 @@
-from typing import Literal
 import yaml
 from jinja2 import Template
 from pathlib import Path
