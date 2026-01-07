@@ -7,11 +7,13 @@ from functools import lru_cache
 logger = logging.getLogger(__name__)
 
 
-class PromptManager:
-    """Manages loading and rendering prompt templates from YAML files."""
+class LLMConfigManager:
+    """Manages loading and rendering config templates
+    (temperature / user | stystem prompts)
+    from YAML files."""
 
-    def __init__(self, prompt_dir: str = r"data/prompts"):
-        self.prompt_dir = Path(prompt_dir)
+    def __init__(self, config_dir: str = r"data/prompts"):
+        self.config_dir = Path(config_dir)
 
     def get_call_config(
         self,
@@ -19,7 +21,7 @@ class PromptManager:
         **kwargs,
     ) -> dict:
         """
-        Retrieves and renders a prompt template from a YAML file.
+        Retrieves and renders a llm call configuration from a YAML file.
 
         Parameters
         ----------
@@ -37,7 +39,7 @@ class PromptManager:
             The rendered llm call configuration if the file and template were
             successfully loaded and rendered.
         """
-        file_path = self.prompt_dir / f"{prompt_name}.yaml"
+        file_path = self.config_dir / f"{prompt_name}.yaml"
 
         raw_data = self._load_file(file_path)
         filled_data = self._render_yaml(raw_data, **kwargs)
@@ -71,8 +73,8 @@ class PromptManager:
         return template.render(**kwargs)
 
 
-manager = PromptManager()
+manager = LLMConfigManager()
 
 
-def get_basic_prompt_manager() -> PromptManager:
+def get_basic_llm_config_manager() -> LLMConfigManager:
     return manager

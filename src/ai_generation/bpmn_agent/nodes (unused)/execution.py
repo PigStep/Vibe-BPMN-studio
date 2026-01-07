@@ -2,7 +2,7 @@ import logging
 
 from ..state import BPMNState
 from ...llm_client import LLMClient
-from ...managers.prompt import PromptManager
+from ...managers.llm_config import LLMConfigManager
 from ...managers.json_schema import (
     JsonSchemaManager,
 )
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def execute(
     state: BPMNState,
     llm: LLMClient,
-    prompt_manager: PromptManager,
+    prompt_manager: LLMConfigManager,
     schema_manager: JsonSchemaManager,
 ) -> BPMNState:
     # Get plan from state

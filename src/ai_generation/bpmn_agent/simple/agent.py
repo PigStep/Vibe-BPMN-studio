@@ -2,7 +2,7 @@ from langgraph.graph import START, END, StateGraph
 from functools import partial
 
 from src.ai_generation.llm_client import get_llm_client
-from src.ai_generation.managers.prompt import PromptManager
+from ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
 from src.ai_generation.bpmn_agent.simple.get_bpmn_node import generate_bpmn
 from src.schemas import SUserInputData
@@ -10,7 +10,7 @@ from src.ai_generation.bpmn_agent.simple.imagine_procces_node import generate_pr
 
 # Define managers and LLM client
 llm = get_llm_client()
-prompt_manager = PromptManager(r"data/prompts/simple")
+prompt_manager = LLMConfigManager(r"data/prompts/simple")
 agent_builder = StateGraph(SimpleBPMNAgent)
 
 
