@@ -1,6 +1,3 @@
-.venv
-__pycache__
-
 .gitignore
 .gitattributes
 
@@ -10,4 +7,25 @@ __pycache__
 .ipnyb
 .ipynb_checkpoints
 
-/data/XMLs/test_schemas
+
+# IDE
+.idea/
+.vscode/
+
+
+# Python environment
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.coverage
+.venv/
+.ipynb_checkpoints/
+
+
+# dev testing code
+tests/
+test.ipynb
+test.py
+data/XMLs/test_schemas/
+temp_data/

@@ -1,38 +1,54 @@
 {
     "type": "object",
     "required": [
+        "schema_name",
         "intent",
-        "description"
+        "execution_steps"
     ],
     "additionalProperties": false,
     "properties": {
         "schema_name": {
             "type": "string",
-            "enum": [
-                "plan"
-            ]
+            "const": "plan"
         },
         "intent": {
             "type": "string",
-            "enum": [
-                "bpmn_diagram"
-            ]
+            "const": "bpmn_diagram"
         },
         "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Short summary of the process for logging"
         },
-        "options": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "collaboration": {
-                    "type": "boolean"
-                },
-                "autoLayout": {
-                    "type": "boolean"
-                },
-                "includeDI": {
-                    "type": "boolean"
+        "execution_steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "step_key",
+                    "system_instruction",
+                    "task_context"
+                ],
+                "properties": {
+                    "step_key": {
+                        "type": "string",
+                        "enum": [
+                            "collaboration",
+                            "process",
+                            "flows",
+                            "diagramm",
+                            "layout"
+                        ],
+                        "description": "Strict execution order: collaboration -> process -> flows -> diagramm -> layout"
+                    },
+                    "system_instruction": {
+                        "type": "string",
+                        "description": "A highly specific, static prompt for the sub-agent, defining its ROLE and JSON FORMAT constraints."
+                    },
+                    "task_context": {
+                        "type": "string",
+                        "description": "Dynamic part: The specific business logic extracted from user input relevant ONLY to this step. (e.g. for Collaboration: 'User mentioned a Manager and an Employee')."
+                    }
                 }
             }
         }

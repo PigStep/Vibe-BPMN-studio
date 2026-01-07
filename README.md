@@ -327,16 +327,17 @@ This project is released under the MIT license. See the `LICENSE` file for detai
 
 ### 🚧 In Progress
 
+- [ ] Implement security measures for abusing
+- [ ] Implement agent redactoring diagramm
 - [ ] Implement XML code validation
 - [ ] Add database persistence for diagrams
+- [ ] Add extended capabilities of diagram generation
 
 ### 📋 Planned Features
 
 - [ ] Add support for additional file formats (PNG, PDF)
 - [ ] Add user authentication and diagram sharing
 - [ ] Create diagram templates library
-- [ ] Implement advanced BPMN element types
-- [ ] Add process simulation capabilities
 
 ## 📞 Support
 

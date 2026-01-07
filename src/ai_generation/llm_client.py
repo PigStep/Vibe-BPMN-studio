@@ -13,10 +13,11 @@ class LLMClient:
         self.client = client
         self.model_name = model_name
 
-    def generate_response(
+    def _generate_response(
         self,
         prompt: str,
         system_prompt: str,
+        temperature: float = 0.7,
         response_format: dict | None = None,
         extra_body: dict | None = None,
     ) -> str | None:
@@ -29,25 +30,27 @@ class LLMClient:
             The user prompt to send to the model.
         system_prompt : str
            The system prompt to send as the initial message to the model.
+        temperature : float, optional
+            Sampling temperature to use for response generation. Default is 0.7.
         response_format : dict | None, optional
-            The format for the model's response
-            ```{
-            "type": "json_schema",
-            "json_schema": {
-                "name": "response_schema",
-                "schema": json_schema,
+            Response format specification. Example:
+            ```
+            {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "response_schema",
+                    "schema": json_schema,
+                }
             }
             ```
-
         extra_body : dict | None, optional
-            Additional key/value pairs to include in the request body (e.g reasoning effort)
-            ```
-            extra_body={"reasoning": {"effort": reasoning_mode}}
-            ```
+            Additional key/value pairs to be included in the request body.
+            Example: {'reasoning': {'effort': 'high'}}.
+
         Returns
         -------
         str | None
-            The content of the first message in the model's response, or None if no content is returned.
+            Content of the first message in the model's response, or None if no content is present.
         """
         response = self.client.chat.completions.create(
             model=self.model_name,
@@ -55,6 +58,7 @@ class LLMClient:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt},
             ],
+            temperature=temperature,
             response_format=response_format if response_format else None,
             extra_body=extra_body if extra_body else None,
         )
@@ -63,8 +67,8 @@ class LLMClient:
     def generate_response_json_based(
         self,
         prompt: str,
-        system_prompt: str,
         json_schema: dict,
+        system_prompt: str,
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
     ) -> str | None:
         """
@@ -78,6 +82,8 @@ class LLMClient:
             The system prompt to be sent as the initial message to the model.
         json_schema : dict
             A JSON Schema dict that defines the expected structure of the model's output.
+        system_promt : str | None, optional
+            Optional system prompt to supplement the user's message.
         reasoning_mode : Literal["none", "minimal", "low", "medium", "high"], optional
             The level of reasoning effort the model should apply when generating the response.
             Defaults to "none".
@@ -87,10 +93,10 @@ class LLMClient:
         str | None
             The JSON response as a string if the model returns a valid response; otherwise, None.
         """
-        return self.generate_response(
-            prompt,
-            system_prompt,
-            {
+        return self._generate_response(
+            prompt=prompt,
+            system_prompt=system_prompt,
+            response_format={
                 "type": "json_schema",
                 "json_schema": {
                     "name": "response_schema",
@@ -105,13 +111,17 @@ class LLMClient:
         prompt: str,
         system_prompt: str,
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
+        temperature: float | None = None,
     ) -> str:
         """
         Generates a text-formatted response from the LLM based on the provided prompt.
         Offer a choice of reasoning effort levels.
         """
-        return self.generate_response(
-            prompt, system_prompt, extra_body={"reasoning": {"effort": reasoning_mode}}
+        return self._generate_response(
+            prompt,
+            system_prompt,
+            extra_body={"reasoning": {"effort": reasoning_mode}},
+            temperature=temperature,
         )
 
 
