@@ -125,12 +125,14 @@ class LLMClient:
         )
 
 
-raw_client = OpenAI(
-    api_key=AI_API_KEY,
-    base_url="https://openrouter.ai/api/v1",
-)
-llm_client = LLMClient(raw_client, MODEL_NAME)
+_llm_client = None
 
 
 def get_llm_client():
-    return llm_client
+    if _llm_client is None:
+        _raw_client = OpenAI(
+            api_key=AI_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+        )
+        _llm_client = LLMClient(_raw_client, MODEL_NAME)
+    return _llm_client
