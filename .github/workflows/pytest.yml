@@ -43,4 +43,4 @@ jobs:
 
       - name: Show coverage summary
         run: |
-          coverage report --show-missing
+          .venv/bin/python -m coverage report --show-missing
