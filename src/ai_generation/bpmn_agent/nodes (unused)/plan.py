@@ -32,7 +32,6 @@ def plan(
     schema_manager: JsonSchemaManager,
     llm: LLMClient,
 ) -> BPMNState:
-
     # get message
 
     intent = state.get("messages")[0]  # First input

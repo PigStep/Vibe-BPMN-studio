@@ -10,7 +10,6 @@ from src.ai_generation.bpmn_agent.simple.imagine_procces_node import generate_pr
 
 
 def build_bpmn_agent() -> StateGraph:
-
     # Define managers and LLM client
     llm = get_llm_client()
     prompt_manager = LLMConfigManager(r"data/prompts/simple")
