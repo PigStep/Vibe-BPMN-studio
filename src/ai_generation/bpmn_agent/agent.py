@@ -3,13 +3,13 @@ from langgraph.graph import StateGraph, START, END
 from functools import partial
 import logging
 
-from src.ai_generation.managers.prompt import get_basic_prompt_manager
+from ai_generation.managers.llm_config import get_basic_llm_config_manager
 from src.ai_generation.managers.json_schema import get_json_schema_namager
 from .state import BPMNState, getBpmnClient
 from .nodes.plan import plan
 from .nodes.execution import execute
 
-promt_manager = get_basic_prompt_manager()
+promt_manager = get_basic_llm_config_manager()
 schema_manager = get_json_schema_namager()
 llm = getBpmnClient()
 

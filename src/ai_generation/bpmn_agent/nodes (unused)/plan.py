@@ -4,7 +4,7 @@ import re
 
 from ..state import BPMNState
 from src.ai_generation.llm_client import LLMClient
-from ai_generation.managers.prompt import PromptManager
+from ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.managers.json_schema import JsonSchemaManager
 
 logger = logging.getLogger(__name__)
@@ -28,11 +28,10 @@ def parse_llm_json(llm_output: str):
 
 def plan(
     state: BPMNState,
-    prompt_manager: PromptManager,
+    prompt_manager: LLMConfigManager,
     schema_manager: JsonSchemaManager,
     llm: LLMClient,
 ) -> BPMNState:
-
     # get message
 
     intent = state.get("messages")[0]  # First input

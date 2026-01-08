@@ -72,3 +72,6 @@ test.ipynb
 test.py
 data/XMLs/test_schemas/
 temp_data/
+
+# AI features
+KODA.md
