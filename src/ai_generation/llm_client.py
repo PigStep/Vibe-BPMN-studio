@@ -2,14 +2,10 @@ from typing import Literal
 from openai import OpenAI
 from settings import get_settings
 
-settings = get_settings()
-
-AI_API_KEY = settings.OPENROUTER_API_KEY
-MODEL_NAME = settings.OPENROUTER_MODEL_NAME
-
 
 class LLMClient:
     def __init__(self, client: OpenAI, model_name: str):
+
         self.client = client
         self.model_name = model_name
 
@@ -132,6 +128,12 @@ def get_llm_client():
     global _llm_client
 
     if _llm_client is None:
+        # by default use .env
+        settings = get_settings()
+
+        AI_API_KEY = settings.OPENROUTER_API_KEY
+        MODEL_NAME = settings.OPENROUTER_MODEL_NAME
+
         _raw_client = OpenAI(
             api_key=AI_API_KEY,
             base_url="https://openrouter.ai/api/v1",

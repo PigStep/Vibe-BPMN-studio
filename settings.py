@@ -24,12 +24,12 @@ class Settings(BaseSettings):
 
     # ==== OPEN ROUTER ====
     OPENROUTER_API_KEY: str = Field(
-        ...,
+        default="",
         description="OpenRouter API key",
         min_length=10,
     )
     OPENROUTER_MODEL_NAME: str = Field(
-        ...,
+        default="anthropic/claude-3-haiku",
         description="OpenRouter model name",
     )
 
@@ -73,6 +73,22 @@ class Settings(BaseSettings):
                 )
         return v
 
+    @model_validator(mode="before")
+    @classmethod
+    def set_test_enviroment(cls, data):
+        """Set defaults if env is for testing"""
+        current_env = os.getenv("ENVIRONMENT", "dev").lower()
+
+        if isinstance(data, dict) and "ENVIROMENT" in data:
+            current_env = str(data["ENVIROMENT"]).lower()
+
+            if current_env == "test":
+                if isinstance(data, dict):
+                    if not data.get("OPENROUTER_API_KEY"):
+                        data["OPENROUTER_API_KEY"] = "test_dummy_key_1234567890"
+
+        return data
+
     @model_validator(mode="after")
     def set_environment_defaults(self):
         """Set default values based on the environment"""
@@ -99,11 +115,7 @@ class Settings(BaseSettings):
         return self.ENVIROMENT == Environment.TEST
 
     model_config = SettingsConfigDict(
-        env_file=(
-            ".env"
-            if Environment(os.getenv("ENVIRONMENT", "dev")) == Environment.DEV
-            else None
-        ),
+        env_file=(".env.test" if os.getenv("ENVIRONMENT") == "test" else ".env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
