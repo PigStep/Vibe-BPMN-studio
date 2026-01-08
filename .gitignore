@@ -68,7 +68,8 @@ __pycache__/
 .vscode/
 
 # dev testing code
-test.ipynb
+htmlcov/
+*.ipynb
 test.py
 data/XMLs/test_schemas/
 temp_data/

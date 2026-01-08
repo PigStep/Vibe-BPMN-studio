@@ -24,6 +24,7 @@ __pycache__/
 
 
 # dev testing code
+htmlcov/
 tests/
 test.ipynb
 test.py

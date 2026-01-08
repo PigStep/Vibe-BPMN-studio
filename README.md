@@ -355,5 +355,5 @@ If you have questions or suggestions:
 
 ---
 
-**Version**: 0.6.0
+**Version**: 0.6.5
 **Last Updated**: January 2026
