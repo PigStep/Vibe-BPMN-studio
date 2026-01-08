@@ -283,7 +283,7 @@ Generate BPMN XML code using AI
 
 ### Testing
 
-- `pytest` – Run tests (to be implemented)
+- `pytest` – Run tests
 - `python -m pytest` – Alternative test command
 
 ## 🎯 Expansion Possibilities
@@ -355,5 +355,5 @@ If you have questions or suggestions:
 
 ---
 
-**Version**: 0.1.0-alpha
-**Last Updated**: December 2025
+**Version**: 0.6.0
+**Last Updated**: January 2026
