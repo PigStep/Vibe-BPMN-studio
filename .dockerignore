@@ -6,7 +6,8 @@
 
 .ipnyb
 .ipynb_checkpoints
-
+.ruff_cache/
+.pytest_cache/
 
 # IDE
 .idea/
