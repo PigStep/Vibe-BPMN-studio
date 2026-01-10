@@ -1,4 +1,5 @@
 from langgraph.graph import START, END, StateGraph
+from langgraph.checkpoint.memory import InMemorySaver
 from functools import partial
 
 from src.ai_generation.llm_client import get_llm_client
@@ -41,17 +42,28 @@ def build_bpmn_agent() -> StateGraph:
 _agent = None
 
 
-def get_agent_answer(initial_state: dict) -> dict:
+def get_compiled_agent():
+    """Lazy initialization of agent with memory"""
     global _agent
     if _agent is None:
-        _agent = build_bpmn_agent().compile()
-    result = _agent.invoke(initial_state)
-    return result
+        # creating checkpoint saver
+        memory = InMemorySaver()
+        _agent = build_bpmn_agent().compile(checkpointer=memory)
+    return _agent
 
 
-def invoke_agent(user_input: SUserInputData) -> str:
+def get_agent_answer(user_input: SUserInputData, thread_id: str) -> dict:
+    agent = get_compiled_agent()
+
+    # Setting up agent
+    config = {"configurable": {"thread_id": thread_id}}
     initial_state = {
         "user_input": user_input.user_input,
         "previous_stage": "",
     }
-    return get_agent_answer(initial_state)
+    return agent.invoke(initial_state, config=config)
+
+
+def invoke_agent(user_input: SUserInputData, thread_id: str) -> str:
+    """Invoke agent with curtrent sssion (thread_id)"""
+    return get_agent_answer(user_input)
