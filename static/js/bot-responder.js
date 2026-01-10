@@ -4,29 +4,29 @@ class BotResponder {
      * @param {string} userMessage - User message
      * @returns {Promise<string>} Response from server
      */
-    async generateResponse(userMessage) {
+    generate_session_id() {
+        return localStorage.getItem('bpmn_session_id') || crypto.randomUUID();
+    }
+    async generateResponseAsync(userMessage) {
         try {
-            // 1. Construct URL with parameters
-            const queryParams = new URLSearchParams({
-                user_input: userMessage
-            });
+            const sessionId = this.generate_session_id();
+            localStorage.setItem('bpmn_session_id', sessionId);
 
-            const url = `/api/generate?${queryParams.toString()}`;
-
-            // 2. Perform GET request
-            const response = await fetch(url, {
-                method: 'GET',
+            // Perform POST request to get xml
+            const response = await fetch('/api/generate', {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                    'X-Session-ID': sessionId
+                },
+                body: JSON.stringify({
+                    user_input: userMessage
+                })
             });
 
-            // 3. Check if response is successful
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            // 4. Retrieve data
             const data = await response.json();
 
             return data.output || JSON.stringify(data);
@@ -35,12 +35,5 @@ class BotResponder {
             console.error('API error:', error);
             return "Sorry, unable to connect to the server.";
         }
-    }
-
-    /**
-     * Wrapper for compatibility with app.js.
-     */
-    async generateResponseAsync(userMessage) {
-        return await this.generateResponse(userMessage);
     }
 }
