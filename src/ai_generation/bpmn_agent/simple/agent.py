@@ -42,6 +42,12 @@ def build_bpmn_agent() -> StateGraph:
 _agent = None
 
 
+def _reset_agent() -> bool:
+    global _agent_agent
+    _agent = None
+    return True
+
+
 def get_compiled_agent():
     """Lazy initialization of agent with memory"""
     global _agent
@@ -66,4 +72,4 @@ def get_agent_answer(user_input: SUserInputData, thread_id: str) -> dict:
 
 def invoke_agent(user_input: SUserInputData, thread_id: str) -> str:
     """Invoke agent with curtrent sssion (thread_id)"""
-    return get_agent_answer(user_input)
+    return get_agent_answer(user_input, thread_id)
