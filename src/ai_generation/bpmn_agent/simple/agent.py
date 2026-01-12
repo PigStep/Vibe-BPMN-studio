@@ -1,13 +1,14 @@
 from langgraph.graph import START, END, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.types import Command
 from functools import partial
 
 from src.ai_generation.llm_client import get_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
-from src.ai_generation.bpmn_agent.simple.get_bpmn_node import generate_bpmn
+from ai_generation.bpmn_agent.simple.nodes.get_bpmn import generate_bpmn
 from src.schemas import SUserInputData
-from src.ai_generation.bpmn_agent.simple.imagine_procces_node import generate_process
+from ai_generation.bpmn_agent.simple.nodes.imagine_procces import generate_process
 
 
 def build_bpmn_agent() -> StateGraph:
@@ -63,6 +64,12 @@ def get_agent_answer(user_input: SUserInputData, thread_id: str) -> dict:
 
     # Setting up agent
     config = {"configurable": {"thread_id": thread_id}}
+
+    # Check was agent waiting editing
+    agent_previous_state = agent.get_state({"configurable": {"thread_id": thread_id}})
+    if agent_previous_state:
+        # If memory is active, our agent should be resumed
+        return agent.invoke(Command(resume=user_input))
     initial_state = {
         "user_input": user_input.user_input,
         "previous_stage": "",
