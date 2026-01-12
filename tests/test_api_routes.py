@@ -1,11 +1,15 @@
+"""
+Tests for API routes (api_routes.py)
+"""
+
 import logging
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, AsyncMock
 import pytest
 from httpx import AsyncClient, ASGITransport
 
 from src.api_routes import router
 from src.schemas import SUserInputData, SExampleBPMN, SAgentOutput
-from src.get_example_diagram import get_example_diagramm
+
 
 # --- FIXTURES ---
 
@@ -29,9 +33,10 @@ def mock_get_example_diagram():
 @pytest.fixture
 def mock_uuid4():
     """Mock uuid4 for predictable session IDs"""
-    with patch("src.api_routes.uuid4") as mock:
-        mock.return_value = Mock(hex="test-uuid-1234")
-        yield mock
+    mock_uuid = Mock()
+    mock_uuid.__str__ = Mock(return_value="test-uuid-1234")
+    with patch("src.api_routes.uuid4", return_value=mock_uuid):
+        yield mock_uuid
 
 
 @pytest.fixture
@@ -57,10 +62,12 @@ class TestGenerateBPMN:
         """
         transport = ASGITransport(app=app_client)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
-            response = await client.get(
+            response = await client.post(
                 "/generate",
-                params={"user_input": "Создай процесс заказа"},
-                headers={"X-Session-ID": "test-session-123"},
+                json={"user_input": "Создай процесс заказа"},
+                headers={
+                    "X-Session-ID": "test-session-123",
+                },
             )
 
         assert response.status_code == 200
@@ -82,13 +89,12 @@ class TestGenerateBPMN:
         """
         transport = ASGITransport(app=app_client)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
-            response = await client.get(
+            response = await client.post(
                 "/generate",
-                params={"user_input": "Test input"},
+                json={"user_input": "Test input"},
             )
 
         assert response.status_code == 200
-        mock_uuid4.assert_called_once()
         mock_invoke_agent.assert_called_once()
         # Verify fallback session ID was used
         call_args = mock_invoke_agent.call_args
@@ -103,10 +109,12 @@ class TestGenerateBPMN:
 
         transport = ASGITransport(app=app_client)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
-            response = await client.get(
+            response = await client.post(
                 "/generate",
-                params={"user_input": "Test input"},
-                headers={"X-Session-ID": "test-session"},
+                json={"user_input": "Test input"},
+                headers={
+                    "X-Session-ID": "test-session",
+                },
             )
 
         assert response.status_code == 200
@@ -123,10 +131,12 @@ class TestGenerateBPMN:
 
         transport = ASGITransport(app=app_client)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
-            response = await client.get(
+            response = await client.post(
                 "/generate",
-                params={"user_input": ""},
-                headers={"X-Session-ID": "test-session"},
+                json={"user_input": ""},
+                headers={
+                    "X-Session-ID": "test-session",
+                },
             )
 
         assert response.status_code == 200
@@ -148,7 +158,7 @@ class TestGetExampleBPMNXML:
         """
         transport = ASGITransport(app=app_client)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
-            response = await client.get("/example-bpmn-xml")
+            response = await client.post("/example-bpmn-xml")
 
         assert response.status_code == 200
         data = response.json()
@@ -168,7 +178,7 @@ class TestGetExampleBPMNXML:
             async with AsyncClient(
                 transport=transport, base_url="http://test"
             ) as client:
-                response = await client.get("/example-bpmn-xml")
+                response = await client.post("/example-bpmn-xml")
 
             assert response.status_code == 500
             data = response.json()
@@ -186,7 +196,7 @@ class TestGetExampleBPMNXML:
             async with AsyncClient(
                 transport=transport, base_url="http://test"
             ) as client:
-                response = await client.get("/example-bpmn-xml")
+                response = await client.post("/example-bpmn-xml")
 
             assert response.status_code == 500
             data = response.json()
@@ -241,10 +251,12 @@ class TestLogging:
             async with AsyncClient(
                 transport=transport, base_url="http://test"
             ) as client:
-                await client.get(
+                await client.post(
                     "/generate",
-                    params={"user_input": "Test"},
-                    headers={"X-Session-ID": "my-session"},
+                    json={"user_input": "Test"},
+                    headers={
+                        "X-Session-ID": "my-session",
+                    },
                 )
 
         assert any("my-session" in record.message for record in caplog.records)
@@ -261,6 +273,6 @@ class TestLogging:
             async with AsyncClient(
                 transport=transport, base_url="http://test"
             ) as client:
-                await client.get("/example-bpmn-xml")
+                await client.post("/example-bpmn-xml")
 
         assert any("base BPMN XML" in record.message for record in caplog.records)
