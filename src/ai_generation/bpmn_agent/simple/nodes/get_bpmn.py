@@ -1,5 +1,5 @@
-from ..state import SimpleBPMNAgent
-from ....llm_client import LLMClient
+from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
+from src.ai_generation.llm_client import LLMClient
 
 
 def generate_bpmn(
