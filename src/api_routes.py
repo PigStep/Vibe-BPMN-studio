@@ -14,7 +14,7 @@ router = APIRouter(
 logger = logging.getLogger(__name__)
 
 
-@router.get("/generate")
+@router.post("/generate")
 async def generate_bpmn(
     user_input: SUserInputData, x_session_id: str = Header(default=None)
 ) -> SAgentOutput:
@@ -37,7 +37,7 @@ async def generate_bpmn(
         return {"output": "Sorry, tech problem. Please retry later."}
 
 
-@router.get("/example-bpmn-xml")
+@router.post("/example-bpmn-xml")
 async def get_example_bpmn_xml() -> SExampleBPMN:
     """
     Get the base BPMN XML structure
