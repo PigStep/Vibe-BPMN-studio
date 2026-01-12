@@ -144,49 +144,6 @@ The application loads with a sample diagram that includes:
 - End event
 - Sequential flows
 
-## 📁 Project Structure
-
-```bash
-vibe-bpmn-studio/
-├── src/                        # Python source code
-│   ├── api_routes.py           # FastAPI routes
-│   ├── get_example_diagram.py  # Example diagram loader
-│   ├── schemas.py              # Pydantic schemas
-│   ├── ai_generation/          # AI agent (LangGraph)
-│   │   ├── llm_client.py       # OpenAI LLM client
-│   │   ├── promts.py           # System prompts
-│   │   └── bpmn_agent/         # BPMN generation agent
-│   │       └── simple/         # Simple agent implementation
-│   │           ├── agent.py    # Main agent logic
-│   │           ├── state.py    # Agent state
-│   │           └── get_bpmn_node.py
-│   └── assemblers/             # XML/JSON generators
-│       ├── xml/                # XML assembly
-│       │   ├── base_xml.py     # Base XML builder
-│       │   ├── bpmn.py         # BPMN XML assembler
-│       │   └── director.py     # XML director
-│       └── json/               # JSON assembly
-│           ├── base.py         # Base JSON assembler
-│           └── bpmn.py         # BPMN JSON assembler
-├── static/                     # Frontend assets
-│   ├── index.html              # Main application interface
-│   ├── css/
-│   │   └── style.css           # Modern styling
-│   └── js/                     # JavaScript modules
-│       ├── app.js              # Main application logic
-│       ├── bpmn-viewer.js      # BPMN viewer management
-│       ├── bpmn-controls.js    # File operations
-│       ├── bot-responder.js    # AI assistant logic
-│       └── ui-manager.js       # UI management
-├── data/                       # Data files
-│   ├── XMLs/                   # BPMN XML templates
-│   └── bpmn_schemas/           # JSON schemas for BPMN
-├── main.py                     # FastAPI application entry point
-├── pyproject.toml              # Python project configuration
-├── settings.py                 # Application settings
-└── README.md                   # Project documentation
-```
-
 ## 🔄 CI/CD Pipeline
 
 This project features a comprehensive CI/CD setup with GitHub Actions:
@@ -324,17 +281,18 @@ This project is released under the MIT license. See the `LICENSE` file for detai
 - [x] Add zoom and viewport controls
 - [x] Create AI chat interface with LangGraph
 - [x] Implement full AI assistant BPMN generation
+- [x] Implement agent redactoring diagramm
+- [x] Implement XML code validation
 
 ### 🚧 In Progress
 
 - [ ] Implement security measures for abusing
-- [ ] Implement agent redactoring diagramm
-- [ ] Implement XML code validation
 - [ ] Add database persistence for diagrams
 - [ ] Add extended capabilities of diagram generation
 
 ### 📋 Planned Features
 
+- [ ] Extend bpmn response quality
 - [ ] Add support for additional file formats (PNG, PDF)
 - [ ] Add user authentication and diagram sharing
 - [ ] Create diagram templates library
