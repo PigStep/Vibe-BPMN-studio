@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from src.ai_generation.bpmn_agent.simple.imagine_procces_node import generate_process
+from ai_generation.bpmn_agent.simple.nodes.imagine_procces import generate_process
 
 # --- TEST --
 
