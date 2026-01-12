@@ -1,11 +1,11 @@
-from .state import SimpleBPMNAgent
-from ...llm_client import LLMClient
+from ..state import SimpleBPMNAgent
+from ....llm_client import LLMClient
 
 
-def generate_process(
+def generate_bpmn(
     state: SimpleBPMNAgent, llm: LLMClient, configuration: dict
 ) -> SimpleBPMNAgent:
-    """Generate business process as plan for given instructions
+    """Genrates XML code from instructions
 
     Args:
         state (SimpleBPMNAgent): state of agent
@@ -15,7 +15,7 @@ def generate_process(
     Returns:
         SimpleBPMNAgent: modified state with generated XML in 'previous_answer' field
     """
-    user_prompt = state["user_input"]
+    user_prompt = state["previous_answer"]
     result = llm.generate_response_text_based(user_prompt, **configuration)
 
     return {**state, "previous_answer": result}
