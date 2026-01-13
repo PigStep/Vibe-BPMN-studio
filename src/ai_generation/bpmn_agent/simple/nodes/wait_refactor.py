@@ -3,7 +3,7 @@ from langgraph.types import interrupt
 from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
 
 
-def wait_for_editing(state: SimpleBPMNAgent) -> SimpleBPMNAgent:
+def wait_refactor(state: SimpleBPMNAgent) -> SimpleBPMNAgent:
     """Call interrupt function to save agent state and wait for new input
 
     Args:

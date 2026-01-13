@@ -1,3 +1,4 @@
+from typing_extensions import Literal
 from langgraph.graph import START, END, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
@@ -9,8 +10,13 @@ from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
 from src.schemas import SUserInputData
 
 from src.ai_generation.bpmn_agent.simple.nodes.get_bpmn import generate_bpmn
+from src.ai_generation.bpmn_agent.simple.nodes.validate_xml import validate_xml
 from src.ai_generation.bpmn_agent.simple.nodes.imagine_procces import generate_process
 from src.ai_generation.bpmn_agent.simple.nodes.wait_refactor import wait_refactor
+
+
+def check_validation(state: SimpleBPMNAgent) -> Literal["true", "false"]:
+    return "true" if state.get("is_valid", False) else "false"
 
 
 def build_bpmn_agent() -> StateGraph:
@@ -34,12 +40,18 @@ def build_bpmn_agent() -> StateGraph:
     # Build workflow
     agent_builder.add_node("imagine", generate_process_with_config)
     agent_builder.add_node("generate", generate_bpmn_with_config)
+    agent_builder.add_node("validate", validate_xml)
+    agent_builder.add_node("refactor", ...)  # TODO: add refactor node
     agent_builder.add_node("wait", wait_refactor)
 
     agent_builder.add_edge(START, "imagine")
     agent_builder.add_edge("imagine", "generate")
     agent_builder.add_edge("generate", "wait")
-    agent_builder.add_edge()
+    agent_builder.add_edge("wait", "validate")
+
+    agent_builder.add_conditional_edges(
+        "validate", check_validation, {"true": "wait", "false": "refactor"}
+    )
 
     return agent_builder
 
