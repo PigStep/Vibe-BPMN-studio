@@ -146,20 +146,11 @@
 
             // Use BotResponder to generate a response
             try {
-                const botResponse = await botResponder.generateResponseAsync(text);
+                const cleanXml = await botResponder.generateResponseAsync(text);
                 // addMessage(botResponse); #TODO: Send stream message of generation
 
-                // Try to find XML structure in the response
-                const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
-
-                if (xmlMatch) {
-                    const xmlContent = xmlMatch[0];
-                    // Clean up from Markdown formatting
-                    const cleanXml = xmlContent.replace(/^```xml\s*/, '').replace(/```$/, '');
-
-                    // Call update function
-                    await updateDiagram(cleanXml);
-                }
+                // Call update function
+                await updateDiagram(cleanXml);
             } catch (error) {
                 console.error('Error generating bot response:', error);
                 addMessage('Sorry, an error occurred while processing your request.');
