@@ -6,8 +6,9 @@ from functools import partial
 from src.ai_generation.llm_client import get_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
+from ai_generation.bpmn_agent.simple.nodes.get_bpmn import generate_bpmn
 from src.schemas import SUserInputData
-from ai_generation.bpmn_agent.simple.nodes.llm_call import llm_call
+from ai_generation.bpmn_agent.simple.nodes.imagine_procces import generate_process
 
 
 def build_bpmn_agent() -> StateGraph:
@@ -18,14 +19,12 @@ def build_bpmn_agent() -> StateGraph:
 
     # Define node with partial
     generate_process_with_config = partial(
-        llm_call,
-        user_prompt_key="user_input",  # get instructions from user
+        generate_process,
         llm=llm,
         configuration=prompt_manager.get_call_config("business_generation"),
     )
     generate_bpmn_with_config = partial(
-        llm_call,
-        user_prompt_key="previous_answer",  # generate new bpmn based on plan
+        generate_bpmn,
         llm=llm,
         configuration=prompt_manager.get_call_config("XML_generation"),
     )
