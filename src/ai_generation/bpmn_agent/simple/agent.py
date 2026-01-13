@@ -6,9 +6,11 @@ from functools import partial
 from src.ai_generation.llm_client import get_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
-from ai_generation.bpmn_agent.simple.nodes.get_bpmn import generate_bpmn
 from src.schemas import SUserInputData
-from ai_generation.bpmn_agent.simple.nodes.imagine_procces import generate_process
+
+from src.ai_generation.bpmn_agent.simple.nodes.get_bpmn import generate_bpmn
+from src.ai_generation.bpmn_agent.simple.nodes.imagine_procces import generate_process
+from src.ai_generation.bpmn_agent.simple.nodes.wait_refactor import wait_refactor
 
 
 def build_bpmn_agent() -> StateGraph:
@@ -32,10 +34,12 @@ def build_bpmn_agent() -> StateGraph:
     # Build workflow
     agent_builder.add_node("imagine", generate_process_with_config)
     agent_builder.add_node("generate", generate_bpmn_with_config)
+    agent_builder.add_node("wait", wait_refactor)
 
     agent_builder.add_edge(START, "imagine")
     agent_builder.add_edge("imagine", "generate")
-    agent_builder.add_edge("generate", END)
+    agent_builder.add_edge("generate", "wait")
+    agent_builder.add_edge()
 
     return agent_builder
 
@@ -72,6 +76,7 @@ def get_agent_answer(user_input: SUserInputData, thread_id: str) -> dict:
         return agent.invoke(Command(resume=user_input))
     initial_state = {
         "user_input": user_input.user_input,
+        "thread_id": thread_id,
         "previous_stage": "",
     }
     return agent.invoke(initial_state, config=config)
