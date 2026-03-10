@@ -1,5 +1,5 @@
 from typing import Any, Dict, List
-from .base import JsonAssembler
+from src.assemblers.json.base import JsonAssembler
 
 
 class BpmnJsonAssembler(JsonAssembler):

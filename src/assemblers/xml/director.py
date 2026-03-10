@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from .bpmn import BpmnBuilder
+from src.assemblers.xml.bpmn import BpmnBuilder
 
 
 class BpmnDirector:
