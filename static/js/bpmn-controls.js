@@ -8,9 +8,17 @@ class BPMNControls {
     }
 
     async loadExampleFromServer() {
-        const response = await fetch(`${this.apiUrl}/example-bpmn-xml`);
-        const data = await response.json();
-        return data.xml;
+        try {
+            const response = await fetch(`${this.apiUrl}/example-bpmn-xml`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            return data.xml;
+        } catch (error) {
+            console.error('Failed to load example BPMN from server:', error);
+            throw error;
+        }
     }
 
     loadFromFile(file) {

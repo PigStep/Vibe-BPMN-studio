@@ -24,32 +24,11 @@
             await bpmnViewer.loadXML(defaultXML);
 
             setupEventListeners();
-            setupTabSwitching();
+            uiManager.initTabs();
         } catch (error) {
             console.error('Initialization error:', error);
         }
     });
-
-    // Setup tab switching
-    function setupTabSwitching() {
-        const tabButtons = document.querySelectorAll('.tab-btn');
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const targetId = e.target.getAttribute('data-target');
-
-                // Update active tab button
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-
-                // Show target content
-                document.querySelectorAll('.sidebar-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.getElementById(targetId).classList.add('active');
-            });
-        });
-    }
 
     async function updateDiagram(xml) {
         try {
@@ -74,7 +53,6 @@
 
             try {
                 const xml = await bpmnControls.loadFromFile(file);
-                // Используем общую функцию обновления
                 await updateDiagram(xml);
             } catch (error) {
                 console.error('File read error:', error);
@@ -126,28 +104,17 @@
         // Chat functionality
         const chatInput = document.getElementById('chat-input');
         const sendChatBtn = document.getElementById('send-chat');
-        const chatHistory = document.getElementById('chat-history');
-
-        function addMessage(text, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-            messageDiv.innerHTML = `<div class="msg-content">${text}</div>`;
-            chatHistory.appendChild(messageDiv);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
 
         sendChatBtn.addEventListener('click', async () => {
             const text = chatInput.value.trim();
             if (!text) return;
 
-            addMessage(text, true);
+            uiManager.addMessage(text, true);
             chatInput.value = '';
-            addMessage('Understood! Thinking about your response. Please wait..');
+            uiManager.addMessage('Understood! Thinking about your response. Please wait..');
 
-            // Use BotResponder to generate a response
             try {
-                const botResponse = await botResponder.generateResponseAsync(text);
-                // addMessage(botResponse); #TODO: Send stream message of generation
+                const botResponse = await botResponder.generateResponse(text);
 
                 // Try to find XML structure in the response
                 const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
@@ -162,7 +129,7 @@
                 }
             } catch (error) {
                 console.error('Error generating bot response:', error);
-                addMessage('Sorry, an error occurred while processing your request.');
+                uiManager.addMessage('Sorry, an error occurred while processing your request.');
             }
         });
 
@@ -171,6 +138,5 @@
                 sendChatBtn.click();
             }
         });
-
     }
 })();

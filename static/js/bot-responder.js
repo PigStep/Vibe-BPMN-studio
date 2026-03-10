@@ -1,46 +1,34 @@
 class BotResponder {
     /**
-     * Generates bot response via API (asynchronously)
+     * Generates bot response via API
      * @param {string} userMessage - User message
      * @returns {Promise<string>} Response from server
      */
     async generateResponse(userMessage) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
         try {
-            // 1. Construct URL with parameters
-            const queryParams = new URLSearchParams({
-                user_input: userMessage
-            });
+            const queryParams = new URLSearchParams({ user_input: userMessage });
+            const url = `${window.AppConfig.API_URL}/generate?${queryParams.toString()}`;
 
-            const url = `/api/generate?${queryParams.toString()}`;
-
-            // 2. Perform GET request
             const response = await fetch(url, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                signal: controller.signal,
             });
 
-            // 3. Check if response is successful
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // 4. Retrieve data
             const data = await response.json();
-
             return data.output || JSON.stringify(data);
 
         } catch (error) {
             console.error('API error:', error);
             return "Sorry, unable to connect to the server.";
+        } finally {
+            clearTimeout(timeoutId);
         }
-    }
-
-    /**
-     * Wrapper for compatibility with app.js.
-     */
-    async generateResponseAsync(userMessage) {
-        return await this.generateResponse(userMessage);
     }
 }

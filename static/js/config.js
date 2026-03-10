@@ -1,6 +1,5 @@
 
-window.AppConfig = {
+window.AppConfig = Object.freeze({
     ENVIRONMENT: 'dev',
-    BASE_URL: '',
     API_URL: '/api',
-};
+});
