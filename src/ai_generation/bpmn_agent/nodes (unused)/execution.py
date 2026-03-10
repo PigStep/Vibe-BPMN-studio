@@ -1,9 +1,9 @@
 import logging
 
-from ..state import BPMNState
-from ...llm_client import LLMClient
-from ...managers.llm_config import LLMConfigManager
-from ...managers.json_schema import (
+from src.ai_generation.bpmn_agent.state import BPMNState
+from src.ai_generation.llm_client import LLMClient
+from src.ai_generation.managers.llm_config import LLMConfigManager
+from src.ai_generation.managers.json_schema import (
     JsonSchemaManager,
 )
 

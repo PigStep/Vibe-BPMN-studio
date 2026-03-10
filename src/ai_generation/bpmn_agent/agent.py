@@ -5,21 +5,25 @@ import logging
 
 from ai_generation.managers.llm_config import get_basic_llm_config_manager
 from src.ai_generation.managers.json_schema import get_json_schema_namager
-from .state import BPMNState, getBpmnClient
-from .nodes.plan import plan
-from .nodes.execution import execute
+from src.ai_generation.bpmn_agent.state import BPMNState, getBpmnClient
+from src.ai_generation.bpmn_agent.simple.get_bpmn_node import generate_bpmn
+from src.ai_generation.bpmn_agent.simple.imagine_procces_node import generate_process
 
-promt_manager = get_basic_llm_config_manager()
+config_manager = get_basic_llm_config_manager()
 schema_manager = get_json_schema_namager()
 llm = getBpmnClient()
 
 logger = logging.getLogger(__name__)
 
-plan_with_config = partial(
-    plan, prompt_manager=promt_manager, llm=llm, schema_manager=schema_manager
+generate_xml = partial(
+    generate_bpmn,
+    llm=llm,
+    configuration=config_manager.get_call_config("XML_generation"),
 )
-execute_with_config = partial(
-    execute, prompt_manager=promt_manager, llm=llm, schema_manager=schema_manager
+imagine_process = partial(
+    generate_process,
+    llm=llm,
+    configuration=config_manager.get_call_config("business_generation"),
 )
 
 
@@ -39,8 +43,8 @@ def all_steps_done(state: BPMNState) -> Literal["true", "false"]:
 agent_builder = StateGraph(BPMNState)
 
 # Add nodes
-agent_builder.add_node("plan", plan_with_config)
-agent_builder.add_node("execute", execute_with_config)
+agent_builder.add_node("plan", generate_xml)
+agent_builder.add_node("execute", imagine_process)
 
 # Define edges
 agent_builder.add_edge(START, "plan")

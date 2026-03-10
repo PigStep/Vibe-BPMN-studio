@@ -2,7 +2,7 @@ import json
 import logging
 import re
 
-from ..state import BPMNState
+from src.ai_generation.bpmn_agent.state import BPMNState
 from src.ai_generation.llm_client import LLMClient
 from ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.managers.json_schema import JsonSchemaManager

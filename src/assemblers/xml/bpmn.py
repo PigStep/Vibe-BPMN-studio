@@ -1,7 +1,7 @@
 from typing import Optional
 from lxml import etree
 import logging
-from .base_xml import BaseXmlBuilder
+from src.assemblers.xml.base_xml import BaseXmlBuilder
 
 
 logger = logging.getLogger(__name__)

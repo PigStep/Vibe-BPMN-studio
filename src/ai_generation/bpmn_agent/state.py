@@ -7,6 +7,7 @@ from settings import get_settings
 
 settings = get_settings()
 
+# TODO: transport to settings.py
 AI_API_KEY = settings.OPENROUTER_API_KEY
 MODEL_NAME = settings.OPENROUTER_MODEL_NAME
 
