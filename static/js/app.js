@@ -18,6 +18,10 @@
 
             bpmnViewer.initialize();
 
+            bpmnViewer.onXMLChange(xml => {
+                document.getElementById('xml-editor').value = xml;
+            });
+
             // Load example on start
             const defaultXML = await bpmnControls.loadExampleFromServer();
             document.getElementById('xml-editor').value = defaultXML;

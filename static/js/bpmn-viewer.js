@@ -42,6 +42,13 @@ class BPMNViewer {
         return result.svg;
     }
 
+    onXMLChange(callback) {
+        this.viewer.on('commandStack.changed', async () => {
+            const xml = await this.saveXML();
+            callback(xml);
+        });
+    }
+
     // Zoom control
     zoomIn() {
         this.#canvas.zoom(this.#canvas.zoom() * 1.2);
