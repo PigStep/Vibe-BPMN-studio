@@ -1,4 +1,4 @@
-name: CI - Pytest (Unit)
+name: CI - Pytest (E2E)
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  pytest:
+  pytest-e2e:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,20 +27,16 @@ jobs:
           pip install uv
           uv sync
 
-      - name: Run pytest with coverage
+      - name: Run e2e tests
         run: |
-          .venv/bin/python -m pytest --cov=src --cov-report=term-missing --cov-report=html -v -k "not e2e"
+          .venv/bin/python -m pytest -v -k "e2e"
         env:
           ENVIROMENT: test
 
-      - name: Upload coverage report
+      - name: Upload e2e test logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: htmlcov/
+          name: e2e-test-logs
+          path: .pytest_cache/
           retention-days: 7
-
-      - name: Show coverage summary
-        run: |
-          .venv/bin/python -m coverage report --show-missing
