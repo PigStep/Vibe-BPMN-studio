@@ -1,3 +1,9 @@
+# TODO
+# - Add type checking (mypy) to catch bugs early
+# - Add security scanning (safety check) for vulnerable dependencies
+# - Consolidate PR workflows (ruff_linter + pytest + docker_hadolint) into single ci-pr.yml
+# - Consider: /health endpoint for container health checks
+
 name: CI/CD - Build, Test & Deploy
 
 on:
