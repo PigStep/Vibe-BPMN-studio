@@ -25,7 +25,7 @@ def setup_test_env(monkeypatch):
     llm_client_module._llm_client = None
 
 
-@pytest.mark.parametrize("reasoning_mode", ["none", "high"])
+@pytest.mark.parametrize("reasoning_mode", ["minimal", "high"])
 def test_llm_e2e_text_with_reasoning(reasoning_mode: ReasoningMode):
     """
     E2E test: text-based response with different reasoning modes.
