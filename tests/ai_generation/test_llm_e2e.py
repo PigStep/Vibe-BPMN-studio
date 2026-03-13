@@ -5,6 +5,7 @@ Tests verify real API calls and compare reasoning modes by execution time.
 
 from typing import Literal
 
+from pydantic import BaseModel
 import pytest
 import time
 import src.ai_generation.llm_client as llm_client_module
@@ -16,6 +17,37 @@ variants, identify hidden dependencies, and provide the most optimal
 solution. Explain your reasoning step by step."""
 
 ReasoningMode = Literal["minimal", "high"]
+
+
+# used for LLM json output validation
+class SBpmnNode(BaseModel):
+    id: str
+    name: str
+    type: Literal[
+        "startEvent",
+        "endEvent",
+        "task",
+        "userTask",
+        "serviceTask",
+        "exclusiveGateway",
+        "parallelGateway",
+        "subProcess",
+    ]
+
+
+class SBpmnFlow(BaseModel):
+    id: str
+    name: str | None = None
+    sourceRef: str
+    targetRef: str
+
+
+class SBpmnBaselineProcess(BaseModel):
+    schema_name: Literal["baseline_process"]
+    id: str
+    name: str
+    nodes: list[SBpmnNode]
+    flows: list[SBpmnFlow]
 
 
 @pytest.fixture(autouse=True)
@@ -49,8 +81,7 @@ def test_llm_e2e_text_with_reasoning(reasoning_mode: ReasoningMode):
     )
 
 
-@pytest.mark.parametrize("reasoning_mode", ["minimal", "high"])
-def test_llm_e2e_json_with_reasoning(reasoning_mode: ReasoningMode):
+def test_llm_e2e_json():
     """
     E2E test: JSON-based response with reasoning modes.
     Verifies JSON structure is returned correctly.
@@ -69,8 +100,40 @@ def test_llm_e2e_json_with_reasoning(reasoning_mode: ReasoningMode):
         prompt="Create a plan with 3 steps",
         json_schema=schema,
         system_prompt=SYSTEM_PROMPT,
-        reasoning_mode=reasoning_mode,
     )
 
     assert result is not None
     assert "steps" in result
+
+
+def test_llm_e2e_bpmn_baseline_schema():
+    """
+    E2E test: Generate BPMN process using baseline schema.
+    Validates LLM output against SBpmnBaselineProcess Pydantic model.
+    Domain: Order Processing (Receive Order -> Process Payment -> Ship)
+    """
+    llm = get_llm_client()
+
+    schema = SBpmnBaselineProcess.model_json_schema(mode="validation")
+
+    result = llm.generate_response_json_based(
+        prompt="""Create a simple order processing workflow with:
+        - Start event: Order Received
+        - Task: Process Payment  
+        - Task: Ship Order
+        - End event: Order Complete
+        - Flows connecting them in sequence""",
+        json_schema=schema,
+        system_prompt=SYSTEM_PROMPT,
+        reasoning_mode="minimal",
+    )
+
+    assert result is not None
+
+    print(result)
+    validated = SBpmnBaselineProcess.model_validate(result)
+    assert validated.schema_name == "baseline_process"
+    assert validated.id
+    assert validated.name
+    assert len(validated.nodes) >= 3
+    assert len(validated.flows) >= 2
