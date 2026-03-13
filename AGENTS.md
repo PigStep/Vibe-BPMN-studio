@@ -1,11 +1,13 @@
 # AGENTS.md - Developer Guide for Vibe BPMN Studio
 
 ## Overview
+
 This is a FastAPI-based web application for creating and editing BPMN diagrams with AI-powered assistance. The backend uses Python 3.13+, LangGraph for AI agents, and lxml for XML generation.
 
 ## Build, Lint, and Test Commands
 
 ### Development
+
 ```bash
 # Install dependencies
 uv sync
@@ -18,6 +20,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Linting and Formatting
+
 ```bash
 # Run ruff linter
 ruff check .
@@ -33,6 +36,7 @@ ruff format .
 ```
 
 ### Testing
+
 ```bash
 # Run all tests
 pytest -v
@@ -54,32 +58,41 @@ pytest -v -k "test_llm"
 ```
 
 ### Environment Variables
+
 ```bash
 # Set environment (dev, prod, test)
 ENVIROMENT=dev
 
 # Required for AI features
 OPENROUTER_API_KEY=your_api_key
-OPENROUTER_MODEL_NAME=anthropic/claude-3-haiku
+OPENROUTER_MODEL_NAME=your_model_name
 ```
+
+NEVER paste your API key and model name here.
 
 ## Code Style Guidelines
 
 ### Python Version
+
 - **Required**: Python 3.13+
 - Use modern Python syntax (type unions with `|` instead of `Optional`)
 
 ### Imports
+
 - Use absolute imports from `src`:
+
   ```python
   from src.schemas import SUserInputData
   from src.ai_generation.llm_client import get_llm_client
   ```
+
 - Third-party imports first, then local imports
 - Standard library imports (logging, typing, etc.) before third-party
 
 ### Type Hints
+
 - Use Python 3.13+ union syntax:
+
   ```python
   # Good
   def foo() -> str | None:
@@ -89,19 +102,23 @@ OPENROUTER_MODEL_NAME=anthropic/claude-3-haiku
   def foo() -> Optional[str]:
       x: Optional[dict] = None
   ```
+
 - Use `Literal` for enum-like string constants:
+
   ```python
   from typing import Literal
   reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none"
   ```
 
 ### Naming Conventions
+
 - **Functions/variables**: snake_case
 - **Classes**: PascalCase
 - **Constants**: SCREAMING_SNAKE_CASE
 - **Private methods**: prefix with underscore
 
 ### Docstrings
+
 Use Google-style docstrings for all public functions and methods:
 
 ```python
@@ -130,6 +147,7 @@ def generate_response(
 ```
 
 ### Logging
+
 Always use module-level loggers:
 
 ```python
@@ -144,6 +162,7 @@ logger.error(f"Failed: {e}")
 ```
 
 ### Error Handling
+
 - Use try/except with logging for error cases
 - Raise specific exceptions with meaningful messages
 - For API routes, use FastAPI's `HTTPException`:
@@ -159,6 +178,7 @@ except ValueError as e:
 ```
 
 ### Pydantic Schemas
+
 - Use Pydantic v2 with `BaseModel`
 - Define response schemas in `src/schemas.py`
 - Use descriptive names with `S` prefix for schemas:
@@ -175,6 +195,7 @@ class SAgentOutput(BaseModel):
 ```
 
 ### FastAPI Routes
+
 - Use `APIRouter` for grouping routes
 - Define tags for documentation
 - Use async/await for I/O operations
@@ -190,6 +211,7 @@ async def generate_bpmn(user_input: str) -> SAgentOutput:
 ```
 
 ### Testing Conventions
+
 - Place tests in `tests/` directory mirroring `src/` structure
 - Use pytest fixtures for test setup
 - Use `mocker` (pytest-mock) for mocking
@@ -209,6 +231,7 @@ def test_agent_invoke(mocker):
 - Test functions should be named `test_*`
 
 ### Project Structure
+
 ```
 src/
 ├── api_routes.py          # FastAPI endpoints
@@ -233,6 +256,7 @@ tests/
 ```
 
 ### LLM Client Usage
+
 When calling the LLM client, use the singleton pattern:
 
 ```python
@@ -247,6 +271,7 @@ result = llm.generate_response_json_based(
 ```
 
 ### XML Generation
+
 Use the builder pattern with lxml:
 
 ```python
