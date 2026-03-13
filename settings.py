@@ -29,7 +29,6 @@ class Settings(BaseSettings):
         min_length=10,
     )
     OPENROUTER_MODEL_NAME: str = Field(
-        default="anthropic/claude-3-haiku",
         description="OpenRouter model name",
     )
 
