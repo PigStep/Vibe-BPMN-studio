@@ -32,6 +32,8 @@ yarn.lock
 .env
 .env.local
 .env.*.local
+# No real data
+!.env.test
 
 # Build outputs
 dist/

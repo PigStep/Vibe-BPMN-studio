@@ -3,6 +3,7 @@ from openai import OpenAI
 from settings import get_settings
 
 
+# TODO: create  Google Ai studio wrapper for better limits
 class LLMClient:
     def __init__(self, client: OpenAI, model_name: str):
         self.client = client
@@ -135,6 +136,7 @@ def get_llm_client():
 
         _raw_client = OpenAI(
             api_key=AI_API_KEY,
+            # FIXME: Add base_url to settings / env
             base_url="https://openrouter.ai/api/v1",
         )
         _llm_client = LLMClient(_raw_client, MODEL_NAME)
