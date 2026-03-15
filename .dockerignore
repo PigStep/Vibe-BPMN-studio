@@ -3,6 +3,8 @@
 
 .env
 .env.example
+#Ignore .env.test for tests
+!.env.test
 
 .ipnyb
 .ipynb_checkpoints

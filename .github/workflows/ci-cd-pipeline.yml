@@ -30,13 +30,9 @@ jobs:
           pip install uv
           uv sync
 
-      - name: Run e2e tests
+      - name: Run e2e tests (Using real env)
         run: |
           .venv/bin/python -m pytest -v -s -k "e2e"
-        env:
-          ENVIROMENT: test
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL_NAME: ${{ secrets.OPENROUTER_MODEL_NAME }}
 
       - name: Upload e2e test logs
         if: always()
