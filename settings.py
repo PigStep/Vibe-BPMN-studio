@@ -1,30 +1,32 @@
 import os
-from pydantic import (
-    field_validator,
-    Field,
-    model_validator,
-)
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from enum import Enum
+from typing import Literal
 
 
-class ENV_ENUM(str, Enum):
-    DEV = "dev"
-    PROD = "prod"
-    TEST = "test"
+def _prepare_env_defaults() -> dict:
+    """Prepare default values based on environment."""
+    defaults = {}
+    env = os.getenv("ENVIROMENT", "dev").lower()
+
+    if env == "prod":
+        defaults["DEBUG_MODE"] = False
+        if os.getenv("LOG_LEVEL", "").upper() == "DEBUG":
+            defaults["LOG_LEVEL"] = "INFO"  # No Debug level in prod
+
+    return defaults
 
 
 class Settings(BaseSettings):
     """Settings for the application"""
 
-    ENVIROMENT: ENV_ENUM = Field(
-        default=ENV_ENUM.DEV,
-        description="ENVIROMENT setting (dev, prod, test)",
+    ENVIROMENT: Literal["dev", "prod", "test"] = Field(
+        default="dev",
+        description="Environment setting (dev, prod, test)",
     )
 
     # ==== OPEN ROUTER ====
     OPENROUTER_API_KEY: str = Field(
-        default="",
         description="OpenRouter API key",
         min_length=10,
     )
@@ -50,69 +52,6 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")
 
-    # === VALIDATORS ===
-    @field_validator("LOG_LEVEL")
-    @classmethod
-    def validate_log_level(cls, v):
-        """Validate the correctness of the log level"""
-        allowed = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-        if v.upper() not in allowed:
-            raise ValueError(f"log_level must be one of: {', '.join(allowed)}")
-        return v.upper()
-
-    @field_validator("ENVIROMENT", mode="before")
-    @classmethod
-    def validate_ENVIROMENT(cls, v):
-        """Convert a string to an ENVIROMENT enum"""
-        if isinstance(v, str):
-            v = v.lower()
-            if v not in [e.value for e in ENV_ENUM]:
-                raise ValueError(
-                    f"ENVIROMENT must be one of: {', '.join([e.value for e in ENV_ENUM])}"
-                )
-        return v
-
-    @model_validator(mode="before")
-    @classmethod
-    def set_test_enviroment(cls, data):
-        """Set defaults if env is for testing"""
-        current_env = os.getenv("ENVIROMENT", "dev").lower()
-
-        if isinstance(data, dict) and "ENVIROMENT" in data:
-            current_env = str(data["ENVIROMENT"]).lower()
-
-            if current_env == "test":
-                if isinstance(data, dict):
-                    if not data.get("OPENROUTER_API_KEY"):
-                        data["OPENROUTER_API_KEY"] = "test_dummy_key_1234567890"
-
-        return data
-
-    @model_validator(mode="after")
-    def set_ENVIROMENT_defaults(self):
-        """Set default values based on the ENVIROMENT"""
-        if self.ENVIROMENT == ENV_ENUM.PROD:
-            self.DEBUG_MODE = False  # Always False in production
-            if self.LOG_LEVEL == "DEBUG":
-                self.LOG_LEVEL = "INFO"  # Minimum INFO in production
-        return self
-
-    # === PROPERTIES ====
-    @property
-    def is_dev(self) -> bool:
-        """Check if ENVIROMENT is dev"""
-        return self.ENVIROMENT == ENV_ENUM.DEV
-
-    @property
-    def is_prod(self) -> bool:
-        """Check if ENVIROMENT is prod"""
-        return self.ENVIROMENT == ENV_ENUM.PROD
-
-    @property
-    def is_test(self) -> bool:
-        """Check if ENVIROMENT is test"""
-        return self.ENVIROMENT == ENV_ENUM.TEST
-
     model_config = SettingsConfigDict(
         env_file=(".env.test" if os.getenv("ENVIROMENT") == "test" else ".env"),
         env_file_encoding="utf-8",
@@ -121,9 +60,9 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()
-
-
 def get_settings() -> Settings:
     """Get settings instance"""
-    return settings
+    return Settings(**_prepare_env_defaults())
+
+
+settings = get_settings()
