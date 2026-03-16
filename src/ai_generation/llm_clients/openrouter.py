@@ -1,13 +1,24 @@
 from typing import Literal
 from openai import OpenAI
 from settings import get_settings
+from src.ai_generation.llm_clients.llm_base import LLMClient
 
 
-# TODO: create  Google Ai studio wrapper for better limits
-class LLMClient:
-    def __init__(self, client: OpenAI, model_name: str):
-        self.client = client
-        self.model_name = model_name
+class OpenRouterClient(LLMClient):
+    def __init__(self):
+        self._setup_client()
+
+    def _setup_client(self):
+        settings = get_settings()
+
+        AI_API_KEY = settings.OPENROUTER_API_KEY
+        self.model_name = settings.OPENROUTER_MODEL_NAME
+
+        raw_client = OpenAI(
+            api_key=AI_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+        )
+        self.client = raw_client
 
     def _generate_response(
         self,
@@ -119,25 +130,3 @@ class LLMClient:
             extra_body={"reasoning": {"effort": reasoning_mode}},
             temperature=temperature,
         )
-
-
-_llm_client = None
-
-
-def get_llm_client():
-    global _llm_client
-
-    if _llm_client is None:
-        # by default use .env
-        settings = get_settings()
-
-        AI_API_KEY = settings.OPENROUTER_API_KEY
-        MODEL_NAME = settings.OPENROUTER_MODEL_NAME
-
-        _raw_client = OpenAI(
-            api_key=AI_API_KEY,
-            # FIXME: Add base_url to settings / env
-            base_url="https://openrouter.ai/api/v1",
-        )
-        _llm_client = LLMClient(_raw_client, MODEL_NAME)
-    return _llm_client

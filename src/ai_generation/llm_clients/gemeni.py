@@ -66,19 +66,4 @@ class GeminiClient(LLMClient):
         )
 
 
-_gemeni_client = None
-
-
-def get_gemini_client() -> GeminiClient:
-    global _gemeni_client
-    if _gemeni_client is None:
-        _gemeni_client = GeminiClient()
-    return _gemeni_client
-
-
-def reset_gemeni_client():
-    global _gemeni_client
-    _gemeni_client = None
-
-
 # https://ai.google.dev/api/generate-content?hl=ru#v1beta.GenerationConfig
