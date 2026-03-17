@@ -1,43 +1,32 @@
 from typing import Literal
+import logging
 from google.genai import types
 from google import genai
 from src.ai_generation.llm_clients.llm_base import LLMClient
 from settings import settings
+from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 
 class GeminiClient(LLMClient):
-    """
-    LLM client for Gemini
-
-    Notes:
-        The client gets the API key from the environment variable `GEMINI_API_KEY`.
-    """
-
     def __init__(self):
+        self._setup_client()
+
+    def _setup_client(self):
         self.model_name = settings.GEMINI_MODEL_NAME
-        # The client gets the API key from the environment variable `GEMINI_API_KEY`.
-        self.client = genai.Client()
+        api_key = settings.GEMINI_API_KEY
+        logger.debug("Using Gemini API key: %s...", api_key[:10])
+        self.client = genai.Client(api_key=api_key)
 
     def _generate_response(
         self,
         prompt: str,
-        system_prompt: str,
-        json_schema: dict | None = None,
-        reasoning_mode: Literal["minimal", "low", "medium", "high"] | None = "low",
-        temperature: float | None = None,
+        generation_config: types.GenerateContentConfig,
     ):
         response = self.client.models.generate_content(
             model=self.model_name,
-            config=types.GenerateContentConfig(
-                # Reasoning mode
-                thinking_config=types.ThinkingConfig(thinking_level=reasoning_mode),
-                # System prompt
-                system_instruction=system_prompt,
-                # Temperature
-                temperature=temperature,
-                # Json schema (if needed)
-                json_schema=json_schema if json_schema else None,
-            ),
+            config=generation_config,
             contents=prompt,
         )
         return response.text
@@ -50,19 +39,31 @@ class GeminiClient(LLMClient):
         temperature: float | None = None,
     ) -> str:
         return self._generate_response(
-            prompt, system_prompt, reasoning_mode, temperature
+            prompt,
+            generation_config=types.GenerateContentConfig(
+                system_instruction=system_prompt,
+                temperature=temperature,
+                thinking_config=types.ThinkingConfig(thinking_level=reasoning_mode),
+            ),
         )
 
     def generate_response_json_based(
         self,
         prompt: str,
         system_prompt: str,
-        json_schema: dict,
+        response_schema: BaseModel,
         reasoning_mode: Literal["minimal", "low", "medium", "high"] | None = "low",
         temperature: float | None = None,
     ):
         return self._generate_response(
-            prompt, system_prompt, reasoning_mode, temperature, json_schema
+            prompt,
+            generation_config=types.GenerateContentConfig(
+                system_instruction=system_prompt,
+                temperature=temperature,
+                thinking_config=types.ThinkingConfig(thinking_level=reasoning_mode),
+                response_mime_type="application/json",
+                response_schema=response_schema.model_json_schema(),
+            ),
         )
 
 
