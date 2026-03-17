@@ -2,13 +2,12 @@ from typing import List
 from openai import OpenAI
 from typing_extensions import TypedDict, Annotated
 import operator
-from src.ai_generation.llm_client import LLMClient
+from src.ai_generation.llm_clients import LLMClient
 from settings import get_settings
 
 settings = get_settings()
 
-# TODO: add E2E test on LLM client
-# TODO: transport to settings.py
+# FIXME: delete
 AI_API_KEY = settings.OPENROUTER_API_KEY
 MODEL_NAME = settings.OPENROUTER_MODEL_NAME
 

@@ -1,7 +1,7 @@
 from langgraph.graph import START, END, StateGraph
 from functools import partial
 
-from src.ai_generation.llm_client import get_llm_client
+from src.ai_generation.llm_clients import get_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
 from src.ai_generation.bpmn_agent.simple.get_bpmn_node import generate_bpmn
