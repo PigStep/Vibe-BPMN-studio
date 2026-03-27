@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str | None = None
     OPENROUTER_MODEL_NAME: str | None = None
 
-    # === GEMENI ====
+    # === GEMINI ====
     GEMINI_API_KEY: str | None = None
     GEMINI_MODEL_NAME: str | None = None
 

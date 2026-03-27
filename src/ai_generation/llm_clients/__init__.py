@@ -1,9 +1,9 @@
 from src.ai_generation.llm_clients.llm_base import LLMClient
-from src.ai_generation.llm_clients.gemeni import GeminiClient
+from src.ai_generation.llm_clients.gemini import GeminiClient
 from src.ai_generation.llm_clients.openrouter import OpenRouterClient
 from settings import settings
 
-_llm: LLMClient = None
+_llm: LLMClient | None = None
 
 provider = settings.PROVIDER_NAME
 

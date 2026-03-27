@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import MagicMock
 from src.ai_generation.llm_clients import OpenRouterClient
 
 

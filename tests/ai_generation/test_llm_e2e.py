@@ -8,7 +8,7 @@ from typing import Literal
 from pydantic import BaseModel
 import pytest
 import time
-from src.ai_generation.llm_clients import get_llm_client, reset_llm_client
+from src.ai_generation.llm_clients import get_llm_client
 
 SYSTEM_PROMPT = """You are an expert in business process analysis.
 Your task is to thoroughly analyze each request, consider all possible
