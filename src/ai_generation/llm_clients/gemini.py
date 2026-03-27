@@ -35,9 +35,9 @@ class GeminiClient(LLMClient):
         self,
         prompt: str,
         system_prompt: str,
-        reasoning_mode: Literal["minimal", "low", "medium", "high"] | None = "low",
+        reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
         temperature: float | None = None,
-    ) -> str:
+    ) -> str | None:
         return self._generate_response(
             prompt,
             generation_config=types.GenerateContentConfig(
@@ -50,11 +50,12 @@ class GeminiClient(LLMClient):
     def generate_response_json_based(
         self,
         prompt: str,
+        json_schema: dict | type[BaseModel],
         system_prompt: str,
-        response_schema: BaseModel,
-        reasoning_mode: Literal["minimal", "low", "medium", "high"] | None = "low",
+        reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
         temperature: float | None = None,
-    ):
+    ) -> str | None:
+        schema = json_schema.model_json_schema() if isinstance(json_schema, type) and issubclass(json_schema, BaseModel) else json_schema
         return self._generate_response(
             prompt,
             generation_config=types.GenerateContentConfig(
@@ -62,7 +63,7 @@ class GeminiClient(LLMClient):
                 temperature=temperature,
                 thinking_config=types.ThinkingConfig(thinking_level=reasoning_mode),
                 response_mime_type="application/json",
-                response_schema=response_schema.model_json_schema(),
+                response_schema=schema,
             ),
         )
 
