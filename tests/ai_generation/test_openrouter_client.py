@@ -50,6 +50,7 @@ def test_generate_text_response_basic(openai_client):
     }  # openai api call by default
 
 
+# TODO: Likvidate tech debt with gemini
 def test_generate_response_json_structure(openai_client):
     """
     Test that answer correctly sending in JSON structure based response_format.
