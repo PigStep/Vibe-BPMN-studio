@@ -14,7 +14,7 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY:?err}
       - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:?err}
       - DEBUG_MODE=${DEBUG_MODE:-false}
-      - ENVIRONMENT=${ENVIRONMENT:-prod}
+      - ENVIROMENT=${ENVIRONMENT:-prod}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - PROVIDER_NAME=${PROVIDER_NAME:-openrouter}
       - SITE_NAME=${SITE_NAME:-Vibe BPMN Studio}
