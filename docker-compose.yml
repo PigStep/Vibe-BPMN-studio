@@ -7,10 +7,14 @@ services:
     ports:
       - "${PORT:-8000}:8000"
     environment:
-      - BASE_URL = {$BASE_URL:?err}
-      - API_URL = {$API_URL:?err}
-
-      - OPENROUTER_API_KEY = {$OPENROUTER_API_KEY:?err} # API key for OpenRouter
-      - MODEL_NAME = {$MODEL_NAME:?err}
-
-      - ENVIROMENT = {$ENVIRONMENT:-prod}
+      - BASE_URL=${BASE_URL:?err}
+      - API_URL=${API_URL:?err}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:?err}
+      - OPENROUTER_MODEL_NAME=${OPENROUTER_MODEL_NAME:?err}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:?err}
+      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:?err}
+      - DEBUG_MODE=${DEBUG_MODE:-false}
+      - ENVIRONMENT=${ENVIRONMENT:-prod}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - PROVIDER_NAME=${PROVIDER_NAME:-openrouter}
+      - SITE_NAME=${SITE_NAME:-Vibe BPMN Studio}
