@@ -55,7 +55,11 @@ class GeminiClient(LLMClient):
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
         temperature: float | None = None,
     ) -> str | None:
-        schema = json_schema.model_json_schema() if isinstance(json_schema, type) and issubclass(json_schema, BaseModel) else json_schema
+        schema = (
+            json_schema.model_json_schema()
+            if isinstance(json_schema, type) and issubclass(json_schema, BaseModel)
+            else json_schema
+        )
         return self._generate_response(
             prompt,
             generation_config=types.GenerateContentConfig(

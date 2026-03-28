@@ -102,7 +102,11 @@ class OpenRouterClient(LLMClient):
         str | None
             The JSON response as a string if the model returns a valid response; otherwise, None.
         """
-        schema = json_schema.model_json_schema() if isinstance(json_schema, type) and issubclass(json_schema, BaseModel) else json_schema
+        schema = (
+            json_schema.model_json_schema()
+            if isinstance(json_schema, type) and issubclass(json_schema, BaseModel)
+            else json_schema
+        )
         return self._generate_response(
             prompt=prompt,
             system_prompt=system_prompt,
