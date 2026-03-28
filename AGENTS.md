@@ -2,167 +2,110 @@
 
 ## Overview
 
-This is a FastAPI-based web application for creating and editing BPMN diagrams with AI-powered assistance. The backend uses Python 3.13+, LangGraph for AI agents, and lxml for XML generation.
+FastAPI-based web app for creating/editing BPMN diagrams with AI-powered assistance. Uses Python 3.13+, LangGraph for AI agents, and lxml for XML generation.
 
 ## Build, Lint, and Test Commands
 
 ### Development
 
 ```bash
-# Install dependencies
-uv sync
-
-# Run development server
-uvicorn main:app --reload
-
-# Run with custom host/port
+uv sync                           # Install dependencies
+uvicorn main:app --reload         # Run dev server
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Linting and Formatting
 
 ```bash
-# Run ruff linter
-ruff check .
-
-# Check code formatting
-ruff format --check .
-
-# Fix linting issues
-ruff check . --fix
-
-# Fix formatting
-ruff format .
+ruff check .                      # Run linter
+ruff check . --fix                # Auto-fix linting issues
+ruff format --check .            # Check formatting
+ruff format .                     # Auto-format
 ```
 
 ### Testing
 
 ```bash
-# Run all tests
-pytest -v
-
-# Run unit tests only (excludes e2e)
-pytest -v -k "not e2e"
-
-# Run e2e tests only
-pytest -v -k "e2e"
-
-# Run a specific test
-pytest -v -k "test_agent_invoke"
-
-# Run with coverage
-pytest --cov=src --cov-report=term-missing
-
-# Run tests matching pattern
-pytest -v -k "test_llm"
+pytest -v                         # Run all tests
+pytest -v -k "not e2e"           # Unit tests only
+pytest -v -k "e2e"               # E2E tests only
+pytest -v -k "test_name"         # Single test by name
+pytest -v -k "test_llm"           # Tests matching pattern
+pytest --cov=src --cov-report=term-missing  # With coverage
 ```
 
 ### Environment Variables
 
 ```bash
-# Set environment (dev, prod, test)
-ENVIROMENT=dev
-
-# Required for AI features
-OPENROUTER_API_KEY=your_api_key
-OPENROUTER_MODEL_NAME=your_model_name
+ENVIROMENT=dev                    # dev, prod, test
+OPENROUTER_API_KEY=...           # AI features (never commit this)
+OPENROUTER_MODEL_NAME=...
 ```
-
-NEVER paste your API key and model name here.
 
 ## Code Style Guidelines
 
 ### Python Version
-
 - **Required**: Python 3.13+
-- Use modern Python syntax (type unions with `|` instead of `Optional`)
+- Use `|` instead of `Optional` for union types
 
 ### Imports
-
 - Use absolute imports from `src`:
-
-  ```python
-  from src.schemas import SUserInputData
-  from src.ai_generation.llm_client import get_llm_client
-  ```
-
-- Third-party imports first, then local imports
-- Standard library imports (logging, typing, etc.) before third-party
+```python
+from src.schemas import SUserInputData
+from src.ai_generation.llm_clients import get_llm_client
+```
+- Order: standard library → third-party → local
 
 ### Type Hints
+```python
+# Good
+def foo() -> str | None:
+    x: dict | None = None
 
-- Use Python 3.13+ union syntax:
-
-  ```python
-  # Good
-  def foo() -> str | None:
-      x: dict | None = None
-  
-  # Avoid
-  def foo() -> Optional[str]:
-      x: Optional[dict] = None
-  ```
-
-- Use `Literal` for enum-like string constants:
-
-  ```python
-  from typing import Literal
-  reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none"
-  ```
+# Use Literal for enum-like strings
+from typing import Literal
+mode: Literal["none", "low", "high"] = "none"
+```
 
 ### Naming Conventions
-
 - **Functions/variables**: snake_case
 - **Classes**: PascalCase
 - **Constants**: SCREAMING_SNAKE_CASE
-- **Private methods**: prefix with underscore
+- **Private methods**: prefix with `_`
 
 ### Docstrings
-
-Use Google-style docstrings for all public functions and methods:
+Google-style docstrings for public functions:
 
 ```python
-def generate_response(
-    prompt: str,
-    system_prompt: str,
-    temperature: float = 0.7,
-) -> str | None:
+def generate_response(prompt: str, temperature: float = 0.7) -> str | None:
     """
-    Generate a response from the LLM using the provided prompt.
+    Generate a response from the LLM.
 
     Parameters
     ----------
     prompt : str
         The user prompt to send to the model.
-    system_prompt : str
-        The system prompt to send as the initial message.
     temperature : float, optional
         Sampling temperature. Default is 0.7.
 
     Returns
     -------
     str | None
-        Content of the first message, or None if no content.
+        Content of the response, or None if no content.
     """
 ```
 
 ### Logging
-
 Always use module-level loggers:
 
 ```python
 import logging
-
 logger = logging.getLogger(__name__)
-
-# Then use appropriate levels
 logger.info("Starting process")
-logger.warning("Something unexpected")
 logger.error(f"Failed: {e}")
 ```
 
 ### Error Handling
-
 - Use try/except with logging for error cases
 - Raise specific exceptions with meaningful messages
 - For API routes, use FastAPI's `HTTPException`:
@@ -178,14 +121,11 @@ except ValueError as e:
 ```
 
 ### Pydantic Schemas
-
 - Use Pydantic v2 with `BaseModel`
-- Define response schemas in `src/schemas.py`
-- Use descriptive names with `S` prefix for schemas:
+- Define schemas in `src/schemas.py`
+- Use `S` prefix for schema names:
 
 ```python
-from pydantic import BaseModel
-
 class SUserInputData(BaseModel):
     user_input: str
 
@@ -195,14 +135,11 @@ class SAgentOutput(BaseModel):
 ```
 
 ### FastAPI Routes
-
 - Use `APIRouter` for grouping routes
 - Define tags for documentation
 - Use async/await for I/O operations
 
 ```python
-from fastapi import APIRouter
-
 router = APIRouter(tags=["API"])
 
 @router.get("/generate")
@@ -210,57 +147,48 @@ async def generate_bpmn(user_input: str) -> SAgentOutput:
     ...
 ```
 
-### Testing Conventions
+## Testing Conventions
 
-- Place tests in `tests/` directory mirroring `src/` structure
-- Use pytest fixtures for test setup
-- Use `mocker` (pytest-mock) for mocking
-- Mark e2e tests with "e2e" in the name:
+- Place tests in `tests/` mirroring `src/` structure
+- Use pytest fixtures and `mocker` (pytest-mock) for mocking
+- Mark e2e tests with "e2e" in the name
+- Test files: `test_*.py`, functions: `test_*`
 
 ```python
 def test_agent_invoke(mocker):
-    """Test description"""
     mock_agent = mocker.patch("path.to.module")
     mock_agent.invoke.return_value = {"result": "success"}
-    
-    # assertions
     assert result == expected
 ```
 
-- Test files should be named `test_*.py`
-- Test functions should be named `test_*`
-
-### Project Structure
+## Project Structure
 
 ```
 src/
-├── api_routes.py          # FastAPI endpoints
-├── schemas.py             # Pydantic models
+├── api_routes.py           # FastAPI endpoints
+├── schemas.py              # Pydantic models
 ├── get_example_diagram.py # Example diagram loader
 ├── ai_generation/
-│   ├── llm_client.py      # OpenAI LLM wrapper
-│   ├── managers/          # Configuration managers
-│   └── bpmn_agent/       # LangGraph agents
-│       ├── agent.py       # Agent definitions
-│       ├── state.py       # Agent state
+│   ├── llm_clients/        # LLM client wrappers
+│   ├── managers/           # Configuration managers
+│   └── bpmn_agent/         # LangGraph agents
 │       └── simple/         # Simple agent impl
+│           ├── agent.py
+│           ├── state.py
+│           └── get_bpmn_node.py
 └── assemblers/
-    ├── xml/               # XML generation
-    └── json/              # JSON generation
+    ├── xml/                # XML generation (lxml)
+    └── json/               # JSON generation
 
 tests/
 └── ai_generation/
-    ├── test_agent.py
-    ├── test_llm_client.py
-    └── nodes/
+    └── test_agent.py
 ```
 
-### LLM Client Usage
-
-When calling the LLM client, use the singleton pattern:
+## LLM Client Usage
 
 ```python
-from src.ai_generation.llm_client import get_llm_client
+from src.ai_generation.llm_clients import get_llm_client
 
 llm = get_llm_client()
 result = llm.generate_response_json_based(
@@ -270,7 +198,7 @@ result = llm.generate_response_json_based(
 )
 ```
 
-### XML Generation
+## XML Generation
 
 Use the builder pattern with lxml:
 
