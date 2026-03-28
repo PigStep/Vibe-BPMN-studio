@@ -88,7 +88,7 @@ def test_llm_e2_json_schema():
         - Task: Ship Order
         - End event: Order Complete
         - Flows connecting them in sequence""",
-        response_schema=SBpmnBaselineProcess,
+        json_schema=SBpmnBaselineProcess,
         system_prompt=SYSTEM_PROMPT,
         reasoning_mode="minimal",
     )
