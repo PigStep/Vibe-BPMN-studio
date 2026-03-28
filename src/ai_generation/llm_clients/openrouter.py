@@ -1,19 +1,31 @@
 from typing import Literal
 from openai import OpenAI
 from settings import get_settings
+from src.ai_generation.llm_clients.llm_base import LLMClient
+from pydantic import BaseModel
 
 
-# TODO: create  Google Ai studio wrapper for better limits
-class LLMClient:
-    def __init__(self, client: OpenAI, model_name: str):
-        self.client = client
-        self.model_name = model_name
+class OpenRouterClient(LLMClient):
+    def __init__(self):
+        self._setup_client()
+
+    def _setup_client(self):
+        settings = get_settings()
+
+        AI_API_KEY = settings.OPENROUTER_API_KEY
+        self.model_name = settings.OPENROUTER_MODEL_NAME
+
+        raw_client = OpenAI(
+            api_key=AI_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+        )
+        self.client = raw_client
 
     def _generate_response(
         self,
         prompt: str,
         system_prompt: str,
-        temperature: float = 0.7,
+        temperature: float | None = None,
         response_format: dict | None = None,
         extra_body: dict | None = None,
     ) -> str | None:
@@ -63,9 +75,10 @@ class LLMClient:
     def generate_response_json_based(
         self,
         prompt: str,
-        json_schema: dict,
+        json_schema: dict | type["BaseModel"],
         system_prompt: str,
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
+        temperature: float | None = None,
     ) -> str | None:
         """
         Generates a JSON-formatted response from the LLM based on the provided prompt and schema.
@@ -74,21 +87,26 @@ class LLMClient:
         ----------
         prompt : str
             The user prompt to be sent to the model.
+        json_schema : dict | BaseModel
+            A JSON Schema dict or Pydantic BaseModel that defines the expected structure of the model's output.
         system_prompt : str
             The system prompt to be sent as the initial message to the model.
-        json_schema : dict
-            A JSON Schema dict that defines the expected structure of the model's output.
-        system_promt : str | None, optional
-            Optional system prompt to supplement the user's message.
         reasoning_mode : Literal["none", "minimal", "low", "medium", "high"], optional
             The level of reasoning effort the model should apply when generating the response.
             Defaults to "none".
+        temperature : float | None, optional
+            Sampling temperature for response generation.
 
         Returns
         -------
         str | None
             The JSON response as a string if the model returns a valid response; otherwise, None.
         """
+        schema = (
+            json_schema.model_json_schema()
+            if isinstance(json_schema, type) and issubclass(json_schema, BaseModel)
+            else json_schema
+        )
         return self._generate_response(
             prompt=prompt,
             system_prompt=system_prompt,
@@ -96,10 +114,11 @@ class LLMClient:
                 "type": "json_schema",
                 "json_schema": {
                     "name": "response_schema",
-                    "schema": json_schema,
+                    "schema": schema,
                 },
             },
             extra_body={"reasoning": {"effort": reasoning_mode}},
+            temperature=temperature,
         )
 
     def generate_response_text_based(
@@ -108,7 +127,7 @@ class LLMClient:
         system_prompt: str,
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
         temperature: float | None = None,
-    ) -> str:
+    ) -> str | None:
         """
         Generates a text-formatted response from the LLM based on the provided prompt.
         Offer a choice of reasoning effort levels.
@@ -119,25 +138,3 @@ class LLMClient:
             extra_body={"reasoning": {"effort": reasoning_mode}},
             temperature=temperature,
         )
-
-
-_llm_client = None
-
-
-def get_llm_client():
-    global _llm_client
-
-    if _llm_client is None:
-        # by default use .env
-        settings = get_settings()
-
-        AI_API_KEY = settings.OPENROUTER_API_KEY
-        MODEL_NAME = settings.OPENROUTER_MODEL_NAME
-
-        _raw_client = OpenAI(
-            api_key=AI_API_KEY,
-            # FIXME: Add base_url to settings / env
-            base_url="https://openrouter.ai/api/v1",
-        )
-        _llm_client = LLMClient(_raw_client, MODEL_NAME)
-    return _llm_client

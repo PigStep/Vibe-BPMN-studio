@@ -13,6 +13,7 @@ router = APIRouter(
 logger = logging.getLogger(__name__)
 
 
+# FIXME: user input typo. Use Schema
 @router.get("/generate")
 async def generate_bpmn(user_input: str) -> SAgentOutput:
     """

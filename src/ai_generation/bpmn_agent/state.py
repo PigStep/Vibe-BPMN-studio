@@ -1,24 +1,11 @@
 from typing import List
-from openai import OpenAI
 from typing_extensions import TypedDict, Annotated
 import operator
-from src.ai_generation.llm_client import LLMClient
-from settings import get_settings
-
-settings = get_settings()
-
-# TODO: add E2E test on LLM client
-# TODO: transport to settings.py
-AI_API_KEY = settings.OPENROUTER_API_KEY
-MODEL_NAME = settings.OPENROUTER_MODEL_NAME
-
-raw_client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=AI_API_KEY)
-
-clientBpmn = LLMClient(raw_client, MODEL_NAME)
+from src.ai_generation.llm_clients import get_llm_client
 
 
 def getBpmnClient():
-    return clientBpmn
+    return get_llm_client()
 
 
 class BPMNState(TypedDict):
