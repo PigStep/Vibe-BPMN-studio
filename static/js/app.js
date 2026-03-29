@@ -151,10 +151,12 @@
                     // Call update function
                     await updateDiagram(cleanXml);
                     uiManager.addSuccess('Готово!');
+                } else if (botResponse.includes('Sorry') || botResponse.includes('tech problem')) {
+                    uiManager.addMessage('К сожалению, сервис AI недоступен. Попробуйте позже.');
                 }
             } catch (error) {
                 console.error('Error generating bot response:', error);
-                uiManager.addMessage('Sorry, an error occurred while processing your request.');
+                uiManager.addMessage('К сожалению, произошла ошибка. Попробуйте позже.');
             }
         });
 

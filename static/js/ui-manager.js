@@ -14,7 +14,10 @@ class UIManager {
 
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-        messageDiv.innerHTML = `<div class="msg-content">${text}</div>`;
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'msg-content';
+        contentDiv.textContent = text;
+        messageDiv.appendChild(contentDiv);
         this.chatHistory.appendChild(messageDiv);
         this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
     }
@@ -33,7 +36,14 @@ class UIManager {
         this._removeTyping();
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message bot success';
-        messageDiv.innerHTML = `<i class="fa-solid fa-check-circle"></i><span>${text}</span>`;
+
+        const icon = document.createElement('i');
+        icon.className = 'fa-solid fa-check-circle';
+        const span = document.createElement('span');
+        span.textContent = text;
+
+        messageDiv.appendChild(icon);
+        messageDiv.appendChild(span);
         this.chatHistory.appendChild(messageDiv);
         this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
 
