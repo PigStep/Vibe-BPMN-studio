@@ -2,9 +2,10 @@ class BotResponder {
     /**
      * Generates bot response via API
      * @param {string} userMessage - User message
+     * @param {Function} onError - Optional callback for error handling
      * @returns {Promise<string>} Response from server
      */
-    async generateResponse(userMessage) {
+    async generateResponse(userMessage, onError) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
 
@@ -26,6 +27,9 @@ class BotResponder {
 
         } catch (error) {
             console.error('API error:', error);
+            if (onError) {
+                onError(error);
+            }
             return "Sorry, unable to connect to the server.";
         } finally {
             clearTimeout(timeoutId);

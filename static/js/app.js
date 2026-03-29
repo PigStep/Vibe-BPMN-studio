@@ -6,15 +6,19 @@
     let bpmnControls;
     let uiManager;
     let botResponder;
+    let notificationManager;
 
     // Initialization on page load
     window.addEventListener('DOMContentLoaded', async () => {
         try {
             // Initialize components
+            notificationManager = new NotificationManager();
             bpmnViewer = new BPMNViewer();
             uiManager = new UIManager();
             bpmnControls = new BPMNControls(bpmnViewer);
             botResponder = new BotResponder();
+
+            notificationManager.info('Справка: Вы можете загрузить свой XML код в отдельном пункте XML. Используйте, если хотите отрисовать XML с помощью сторонней LLM');
 
             bpmnViewer.initialize();
 
@@ -118,7 +122,9 @@
             uiManager.addMessage('Understood! Thinking about your response. Please wait..');
 
             try {
-                const botResponse = await botResponder.generateResponse(text);
+                const botResponse = await botResponder.generateResponse(text, (error) => {
+                    notificationManager.error('Сервис AI не отвечает. Используйте панель XML код и сторонний LLM.');
+                });
 
                 // Try to find XML structure in the response
                 const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
