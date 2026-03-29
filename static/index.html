@@ -59,10 +59,16 @@
 
             <div id="chat-panel" class="sidebar-content active">
                 <div class="chat-history" id="chat-history">
-                    <div class="message bot">
-                        <div class="msg-content">Привет! Я помогу создать диаграмму. Напиши, что добавить (например,
-                            "Добавь задачу 'Проверка отчета'").</div>
+                    <div class="message bot hint">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <div class="msg-content">Опишите вашу предметную область. Или загрузите ваш XML код для старта редактирования</div>
                     </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Ваш запрос...">
+                    <button id="send-chat" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
                 </div>
                 <div class="chat-input-area">
                     <input type="text" id="chat-input" placeholder="Ваш запрос...">

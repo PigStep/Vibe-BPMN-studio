@@ -119,7 +119,7 @@
 
             uiManager.addMessage(text, true);
             chatInput.value = '';
-            uiManager.addMessage('Understood! Thinking about your response. Please wait..');
+            uiManager.showTyping();
 
             try {
                 const botResponse = await botResponder.generateResponse(text, (error) => {
