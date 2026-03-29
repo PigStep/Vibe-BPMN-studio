@@ -6,8 +6,8 @@ class SExampleBPMN(BaseModel):
     xml: str
 
 
-# TODO: update class add session ID
 class SUserInputData(BaseModel):
+    session_id: str
     user_input: str
 
 

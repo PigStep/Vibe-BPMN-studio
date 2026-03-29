@@ -7,10 +7,24 @@
     let uiManager;
     let botResponder;
     let notificationManager;
+    let sessionId;
+
+    function getOrCreateSessionId() {
+        const storageKey = 'vibe-bpmn-session-id';
+        let id = localStorage.getItem(storageKey);
+        if (!id) {
+            id = crypto.randomUUID();
+            localStorage.setItem(storageKey, id);
+        }
+        return id;
+    }
 
     // Initialization on page load
     window.addEventListener('DOMContentLoaded', async () => {
         try {
+            sessionId = getOrCreateSessionId();
+            console.log('Session ID:', sessionId);
+
             // Initialize components
             notificationManager = new NotificationManager();
             bpmnViewer = new BPMNViewer();
@@ -122,7 +136,7 @@
             uiManager.showTyping();
 
             try {
-                const botResponse = await botResponder.generateResponse(text, (error) => {
+                const botResponse = await botResponder.generateResponse(text, sessionId, (error) => {
                     notificationManager.error('Сервис AI не отвечает. Используйте панель XML код и сторонний LLM.');
                 });
 
