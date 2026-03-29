@@ -13,13 +13,12 @@ router = APIRouter(
 logger = logging.getLogger(__name__)
 
 
-# FIXME: user input typo. Use Schema
-@router.get("/generate")
-async def generate_bpmn(user_input: str) -> SAgentOutput:
+@router.post("/generate")
+async def generate_bpmn(user_data: SUserInputData) -> SAgentOutput:
     """
     Generate BPMN XML code to render with bpmn-js
     """
-    user_data = SUserInputData(user_input=user_input)
+    logger.info("Recived diagram request. SessionID: %s", user_data.session_id)
     xml = await asyncio.to_thread(invoke_agent, user_data)
     return {
         "output": xml.get("previous_answer", "Sorry, tech problem. Please retry later.")

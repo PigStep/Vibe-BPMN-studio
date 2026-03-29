@@ -4,14 +4,70 @@
 class UIManager {
     constructor() {
         this.chatHistory = document.getElementById('chat-history');
+        this.hintElement = document.querySelector('.message.hint');
+        this.typingElement = null;
     }
 
     addMessage(text, isUser = false) {
+        this._removeTyping();
+        this._hideHint();
+
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-        messageDiv.innerHTML = `<div class="msg-content">${text}</div>`;
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'msg-content';
+        contentDiv.textContent = text;
+        messageDiv.appendChild(contentDiv);
         this.chatHistory.appendChild(messageDiv);
         this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
+    }
+
+    showTyping() {
+        this._removeTyping();
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot typing-indicator';
+        typingDiv.innerHTML = '<div class="spinner"></div>';
+        typingDiv.id = 'typing-indicator';
+        this.chatHistory.appendChild(typingDiv);
+        this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
+    }
+
+    addSuccess(text) {
+        this._removeTyping();
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot success';
+
+        const icon = document.createElement('i');
+        icon.className = 'fa-solid fa-check-circle';
+        const span = document.createElement('span');
+        span.textContent = text;
+
+        messageDiv.appendChild(icon);
+        messageDiv.appendChild(span);
+        this.chatHistory.appendChild(messageDiv);
+        this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
+
+        setTimeout(() => {
+            messageDiv.classList.add('fade-out');
+            setTimeout(() => messageDiv.remove(), 300);
+        }, 2000);
+    }
+
+    _removeTyping() {
+        const existing = document.getElementById('typing-indicator');
+        if (existing) existing.remove();
+    }
+
+    _hideHint() {
+        if (this.hintElement && !this.hintElement.classList.contains('fade-out')) {
+            this.hintElement.classList.add('fade-out');
+            setTimeout(() => {
+                if (this.hintElement?.parentNode) {
+                    this.hintElement.remove();
+                    this.hintElement = null;
+                }
+            }, 300);
+        }
     }
 
     initTabs() {

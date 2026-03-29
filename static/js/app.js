@@ -6,15 +6,33 @@
     let bpmnControls;
     let uiManager;
     let botResponder;
+    let notificationManager;
+    let sessionId;
+
+    function getOrCreateSessionId() {
+        const storageKey = 'vibe-bpmn-session-id';
+        let id = localStorage.getItem(storageKey);
+        if (!id) {
+            id = crypto.randomUUID();
+            localStorage.setItem(storageKey, id);
+        }
+        return id;
+    }
 
     // Initialization on page load
     window.addEventListener('DOMContentLoaded', async () => {
         try {
+            sessionId = getOrCreateSessionId();
+            console.log('Session ID:', sessionId);
+
             // Initialize components
+            notificationManager = new NotificationManager();
             bpmnViewer = new BPMNViewer();
             uiManager = new UIManager();
             bpmnControls = new BPMNControls(bpmnViewer);
             botResponder = new BotResponder();
+
+            notificationManager.info('Справка: Вы можете загрузить свой XML код в отдельном пункте XML. Используйте, если хотите отрисовать XML с помощью сторонней LLM');
 
             bpmnViewer.initialize();
 
@@ -115,10 +133,12 @@
 
             uiManager.addMessage(text, true);
             chatInput.value = '';
-            uiManager.addMessage('Understood! Thinking about your response. Please wait..');
+            uiManager.showTyping();
 
             try {
-                const botResponse = await botResponder.generateResponse(text);
+                const botResponse = await botResponder.generateResponse(text, sessionId, (error) => {
+                    notificationManager.error('Сервис AI не отвечает. Используйте панель XML код и сторонний LLM.');
+                });
 
                 // Try to find XML structure in the response
                 const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
@@ -130,10 +150,13 @@
 
                     // Call update function
                     await updateDiagram(cleanXml);
+                    uiManager.addSuccess('Готово!');
+                } else if (botResponse.includes('Sorry') || botResponse.includes('tech problem')) {
+                    uiManager.addMessage('К сожалению, сервис AI недоступен. Попробуйте позже.');
                 }
             } catch (error) {
                 console.error('Error generating bot response:', error);
-                uiManager.addMessage('Sorry, an error occurred while processing your request.');
+                uiManager.addMessage('К сожалению, произошла ошибка. Попробуйте позже.');
             }
         });
 

@@ -208,6 +208,7 @@ body {
     flex-direction: column;
     border-left: 1px solid var(--c-border);
     z-index: 5;
+    overflow: hidden;
 }
 
 .sidebar-tabs {
@@ -245,6 +246,7 @@ body {
     padding: 20px;
     overflow: hidden;
     background-color: var(--c-bg-panel);
+    min-height: 0;
 }
 
 .sidebar-content.active {
@@ -273,9 +275,22 @@ body {
     gap: 12px;
     margin-bottom: 20px;
     padding-right: 8px;
-    /* Стилизация скроллбара */
+    min-height: 0;
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
+}
+
+.chat-history::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-history::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
 }
 
 .message {
@@ -300,6 +315,84 @@ body {
     color: white;
     border-bottom-right-radius: 2px;
     box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+/* Hint message (первое приветственное сообщение) */
+.message.hint {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px dashed #93c5fd;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.message.hint i {
+    color: #2563eb;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.message.hint .msg-content {
+    flex: 1;
+}
+
+.message.hint.fade-out {
+    animation: fadeOutHint 0.3s ease-out forwards;
+}
+
+@keyframes fadeOutHint {
+    to {
+        opacity: 0;
+        height: 0;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+}
+
+/* Typing indicator (спиннер загрузки) */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: var(--c-bg-secondary);
+    border-radius: 12px;
+    border-bottom-left-radius: 2px;
+    align-self: flex-start;
+}
+
+.typing-indicator .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--c-border);
+    border-top-color: var(--c-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success message (галочка "Готово") */
+.message.success {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #6ee7b7;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.message.success i {
+    color: #10b981;
+    font-size: 1rem;
+}
+
+.message.success.fade-out {
+    animation: fadeOutHint 0.3s ease-out forwards;
 }
 
 .chat-input-area {
@@ -355,4 +448,108 @@ body {
     border-radius: var(--radius);
     line-height: 1.5;
     outline: none;
+}
+
+/* --- Toast Notifications --- */
+.toast-container {
+    position: fixed;
+    top: calc(var(--header-height) + 16px);
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 360px;
+}
+
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background-color: var(--c-bg-panel);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-left: 4px solid var(--c-primary);
+    animation: toastIn 0.25s ease-out;
+}
+
+.toast-exit {
+    animation: toastOut 0.2s ease-out forwards;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+.toast-info {
+    border-left-color: var(--c-primary);
+}
+
+.toast-info i {
+    color: var(--c-primary);
+}
+
+.toast-warning {
+    border-left-color: #f59e0b;
+}
+
+.toast-warning i {
+    color: #f59e0b;
+}
+
+.toast-error {
+    border-left-color: #ef4444;
+}
+
+.toast-error i {
+    color: #ef4444;
+}
+
+.toast i {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--c-text-main);
+}
+
+.toast-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--c-text-muted);
+    padding: 4px;
+    margin: -4px -4px -4px 0;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.toast-close:hover {
+    background-color: var(--c-bg-secondary);
+    color: var(--c-text-main);
 }
