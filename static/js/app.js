@@ -136,6 +136,7 @@
 
                     // Call update function
                     await updateDiagram(cleanXml);
+                    uiManager.addSuccess('Готово!');
                 }
             } catch (error) {
                 console.error('Error generating bot response:', error);

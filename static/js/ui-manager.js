@@ -29,6 +29,20 @@ class UIManager {
         this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
     }
 
+    addSuccess(text) {
+        this._removeTyping();
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot success';
+        messageDiv.innerHTML = `<i class="fa-solid fa-check-circle"></i><span>${text}</span>`;
+        this.chatHistory.appendChild(messageDiv);
+        this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
+
+        setTimeout(() => {
+            messageDiv.classList.add('fade-out');
+            setTimeout(() => messageDiv.remove(), 300);
+        }, 2000);
+    }
+
     _removeTyping() {
         const existing = document.getElementById('typing-indicator');
         if (existing) existing.remove();

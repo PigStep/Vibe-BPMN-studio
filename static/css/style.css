@@ -377,6 +377,24 @@ body {
     }
 }
 
+/* Success message (галочка "Готово") */
+.message.success {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #6ee7b7;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.message.success i {
+    color: #10b981;
+    font-size: 1rem;
+}
+
+.message.success.fade-out {
+    animation: fadeOutHint 0.3s ease-out forwards;
+}
+
 .chat-input-area {
     display: flex;
     gap: 8px;
