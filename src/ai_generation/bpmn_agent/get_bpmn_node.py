@@ -1,4 +1,4 @@
-from src.ai_generation.bpmn_agent.simple.state import SimpleBPMNAgent
+from src.ai_generation.bpmn_agent.state import SimpleBPMNAgent
 from src.ai_generation.llm_clients import LLMClient
 
 
