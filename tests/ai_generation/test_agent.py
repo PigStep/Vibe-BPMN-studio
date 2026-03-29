@@ -15,7 +15,7 @@ def test_agent_invoke(mocker):
     """
     mock_agent = mocker.patch(SCRIPT_DIR + "._agent")
     mock_agent.invoke.return_value = {"result": "success"}
-    test_user_data = SUserInputData(user_input="Send me success")
+    test_user_data = SUserInputData(session_id="test_id", user_input="Send me success")
 
     result = invoke_agent(test_user_data)
 
@@ -38,7 +38,7 @@ def test_agent_full_flow(mocker):
     mock_process_node.return_value = {"result": "called"}
     mock_bpmn_node.return_value = {"result": "called"}
 
-    invoke_agent(SUserInputData(user_input="Test flow"))
+    invoke_agent(SUserInputData(session_id="test_id", user_input="Test flow"))
 
     assert mock_process_node.called
     assert mock_process_node.called
