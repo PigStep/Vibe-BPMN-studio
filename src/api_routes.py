@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 
 from src.get_example_diagram import get_example_diagramm
-from src.ai_generation.bpmn_agent.simple.agent import invoke_agent
+from src.ai_generation.bpmn_agent.agent import invoke_agent
 from src.schemas import SExampleBPMN, SAgentOutput, SUserInputData
 
 router = APIRouter(

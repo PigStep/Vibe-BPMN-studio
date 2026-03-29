@@ -2,6 +2,7 @@ from typing import Dict, Any
 from src.assemblers.xml.bpmn import BpmnBuilder
 
 
+# Not used for now
 class BpmnDirector:
     def __init__(self, builder: BpmnBuilder | None):
         if builder is None:

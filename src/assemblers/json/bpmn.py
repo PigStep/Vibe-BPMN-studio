@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 from src.assemblers.json.base import JsonAssembler
 
 
+# Do not used for now
 class BpmnJsonAssembler(JsonAssembler):
     """
     Specialized assembler for BPMN.
