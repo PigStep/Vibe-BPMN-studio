@@ -1,9 +1,9 @@
 from unittest.mock import Mock
 
 from src.schemas import SUserInputData
-from ai_generation.bpmn_agent.agent import invoke_agent
+from src.ai_generation.bpmn_agent.agent import invoke_agent
 
-SCRIPT_DIR = "src.ai_generation.bpmn_agent.simple.agent"
+SCRIPT_DIR = "src.ai_generation.bpmn_agent.agent"
 
 # --- TESTS ---
 
