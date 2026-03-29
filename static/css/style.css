@@ -208,6 +208,7 @@ body {
     flex-direction: column;
     border-left: 1px solid var(--c-border);
     z-index: 5;
+    overflow: hidden;
 }
 
 .sidebar-tabs {
@@ -245,6 +246,7 @@ body {
     padding: 20px;
     overflow: hidden;
     background-color: var(--c-bg-panel);
+    min-height: 0;
 }
 
 .sidebar-content.active {
@@ -273,9 +275,22 @@ body {
     gap: 12px;
     margin-bottom: 20px;
     padding-right: 8px;
-    /* Стилизация скроллбара */
+    min-height: 0;
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
+}
+
+.chat-history::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-history::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
 }
 
 .message {
