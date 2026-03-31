@@ -1,9 +1,9 @@
 from typing import Literal
-from src.ai_generation.managers.tool.gemini import GemimiToolManager
+from src.ai_generation.managers.tool.gemini import GeminiToolManager
 from src.ai_generation.managers.tool.openrouter import OpenAIToolManager
 from src.ai_generation.managers.tool.manager_base import ToolManager
 
-_manager: ToolManager = None
+_manager: ToolManager | None = None
 
 
 def get_tool_manager(provider: Literal["openrouter", "gemini"]) -> ToolManager:
@@ -11,7 +11,7 @@ def get_tool_manager(provider: Literal["openrouter", "gemini"]) -> ToolManager:
     if _manager is None:
         match provider:
             case "gemini":
-                _manager = GemimiToolManager()
+                _manager = GeminiToolManager()
             case "openrouter":
                 _manager = OpenAIToolManager()
             case _:
