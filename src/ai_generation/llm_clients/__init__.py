@@ -1,14 +1,15 @@
+from typing import Literal
+from settings import settings
 from src.ai_generation.llm_clients.llm_base import LLMClient
 from src.ai_generation.llm_clients.gemini import GeminiClient
 from src.ai_generation.llm_clients.openrouter import OpenRouterClient
-from settings import settings
 
 _llm: LLMClient | None = None
 
-provider = settings.PROVIDER_NAME
 
-
-def get_llm_client() -> LLMClient:
+def get_llm_client(provider: Literal["gemini", "openrouter"] = None) -> LLMClient:
+    if provider is None:
+        provider = settings.PROVIDER_NAME
     global _llm
     if _llm is None:
         match provider:
