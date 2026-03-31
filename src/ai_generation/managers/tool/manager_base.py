@@ -1,19 +1,21 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Any
 from pydantic import Json
-from src.ai_generation.llm_clients.llm_base import LLMClient
 
 
 class ToolManager(ABC):
-    """
-    Return function call JSON object for choosen aggregator (Gemini, OpenAI)
-    """
+    @abstractmethod
+    def save_tools(self, tools: list[Callable]) -> None:
+        """Convert and store tools in provider-specific format."""
 
     @abstractmethod
-    def save_tools(self, tools: list[Callable]): ...
+    def get_tools(self) -> list[Any]:
+        """Return tools formatted for LLM request."""
 
     @abstractmethod
-    def get_tools(self) -> list[Json]: ...
+    def execute_tool(self, tool_name: str, arguments: dict) -> str:
+        """Execute a tool by name with given arguments."""
 
     @abstractmethod
-    def call_tools(self, llm_client: LLMClient, prompt: str, **config) -> str: ...
+    def has_tool(self, tool_name: str) -> bool:
+        """Check if a tool with given name exists."""
