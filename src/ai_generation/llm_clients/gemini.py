@@ -2,15 +2,17 @@ from typing import Literal
 import logging
 from google.genai import types
 from google import genai
+from pydantic import BaseModel
 from src.ai_generation.llm_clients.llm_base import LLMClient
 from settings import settings
-from pydantic import BaseModel
+from src.ai_generation.managers.tool import GemimiToolManager
 
 logger = logging.getLogger(__name__)
 
 
 class GeminiClient(LLMClient):
-    def __init__(self):
+    def __init__(self, tool_manager: GemimiToolManager):
+        self.tool_manager = tool_manager
         self._setup_client()
 
     def _setup_client(self):
@@ -19,7 +21,7 @@ class GeminiClient(LLMClient):
         logger.debug("Using Gemini API key: %s...", api_key[:10])
         self.client = genai.Client(api_key=api_key)
 
-    def _generate_response(
+    def generate_response(
         self,
         prompt: str,
         generation_config: types.GenerateContentConfig,
@@ -38,7 +40,7 @@ class GeminiClient(LLMClient):
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
         temperature: float | None = None,
     ) -> str | None:
-        return self._generate_response(
+        return self.generate_response(
             prompt,
             generation_config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
@@ -60,7 +62,7 @@ class GeminiClient(LLMClient):
             if isinstance(json_schema, type) and issubclass(json_schema, BaseModel)
             else json_schema
         )
-        return self._generate_response(
+        return self.generate_response(
             prompt,
             generation_config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
