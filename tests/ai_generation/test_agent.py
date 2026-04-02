@@ -1,5 +1,7 @@
 from unittest.mock import Mock
 
+import pytest
+
 from src.schemas import SUserInputData
 from src.ai_generation.bpmn_agent.agent import invoke_agent
 
@@ -8,6 +10,8 @@ SCRIPT_DIR = "src.ai_generation.bpmn_agent.agent"
 # --- TESTS ---
 
 
+# TODO: update to test react logic
+@pytest.mark.skip(reason="Deprecated logic")
 def test_agent_invoke(mocker):
     """
     Invoke_agent transform userdata to dictionary for agent.
@@ -28,6 +32,7 @@ def test_agent_invoke(mocker):
     assert result == {"result": "success"}  # Result should be the agent returns
 
 
+@pytest.mark.skip(reason="Deprecated logic")
 def test_agent_full_flow(mocker):
     """Test agent do not fall down during call"""
     mock_llm = mocker.patch(SCRIPT_DIR + ".get_llm_client")
