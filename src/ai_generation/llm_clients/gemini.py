@@ -3,8 +3,7 @@ import logging
 from google.genai import types
 from google import genai
 from pydantic import BaseModel
-from langchain_core.tools.structured import StructuredTool
-from src.ai_generation.llm_clients.llm_base import LLMClient, SToolCall
+from src.ai_generation.llm_clients.llm_base import LLMClient
 from settings import settings
 
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 from typing import Literal, Any
 from openai import OpenAI
 from settings import get_settings
-from src.ai_generation.llm_clients.llm_base import LLMClient, SToolCall
+from src.ai_generation.llm_clients.llm_base import LLMClient
 from pydantic import BaseModel
 
 
