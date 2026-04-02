@@ -1,7 +1,9 @@
-from typing import Annotated
 from langchain_core.runnables import RunnableConfig
 from pydantic import BaseModel, Field
-from langchain_core.tools import tool, InjectedToolArg
+from langchain_core.tools import tool
+import logging
+
+from requests import session
 from src.ai_generation.llm_clients import LLMClient
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.tools.generate_bpmn_draft.generate_xml import (
@@ -10,6 +12,8 @@ from src.ai_generation.bpmn_agent.tools.generate_bpmn_draft.generate_xml import 
 from src.ai_generation.bpmn_agent.tools.generate_bpmn_draft.imagine_process import (
     imagine_process,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class SGenerateDraftArgs(BaseModel):
@@ -22,7 +26,9 @@ def generate_draft(user_prompt: str, config: RunnableConfig):
     configurable = config.get("configurable", {})
     llm: LLMClient = configurable["llm"]
     config_manager: LLMConfigManager = configurable["config_manager"]
+    session_id: str = configurable["session_id"]
 
+    logger.info("[%s] generating draft", session_id)
     bpmn_plan = imagine_process(
         request=user_prompt,
         llm=llm,
