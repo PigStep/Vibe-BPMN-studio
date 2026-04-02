@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Literal, Any
-from src.ai_generation.managers.tool.manager_base import ToolManager
+from langchain_core.tools.structured import StructuredTool
+from src.ai_generation.managers.tool.manager_base import SToolCall, ToolManager
 
 
 class LLMClient(ABC):
@@ -26,11 +27,11 @@ class LLMClient(ABC):
     ) -> str | None: ...
 
     @abstractmethod
-    def generate_response_with_tools(
+    def generate_tool_call(
         self,
         prompt: str,
         system_prompt: str,
-        tools: list[Any] | None = None,
+        tools: list[StructuredTool] | None = None,
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
         temperature: float | None = None,
-    ) -> Any: ...
+    ) -> list[SToolCall]: ...
