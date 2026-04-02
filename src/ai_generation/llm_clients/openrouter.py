@@ -7,6 +7,7 @@ from src.ai_generation.managers.tool.openrouter import OpenAIToolManager
 from pydantic import BaseModel
 
 
+# TODO: deprecated. Will be removed in future
 class OpenRouterClient(LLMClient):
     def __init__(self):
         self.tool_manager: ToolManager | None = None
