@@ -1,4 +1,3 @@
-from settings import settings
 from langchain_classic.schema import AIMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage

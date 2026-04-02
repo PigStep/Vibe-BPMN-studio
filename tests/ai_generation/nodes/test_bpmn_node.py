@@ -1,5 +1,7 @@
 from unittest.mock import Mock
 
+import pytest
+
 from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
 
 # --- TEST ---

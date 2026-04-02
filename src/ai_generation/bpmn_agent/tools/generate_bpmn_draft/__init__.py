@@ -2,8 +2,6 @@ from langchain_core.runnables import RunnableConfig
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 import logging
-
-from requests import session
 from src.ai_generation.llm_clients import LLMClient
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.tools.generate_bpmn_draft.generate_xml import (

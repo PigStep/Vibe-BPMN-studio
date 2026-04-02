@@ -2,15 +2,12 @@ from typing import Literal, Any
 from openai import OpenAI
 from settings import get_settings
 from src.ai_generation.llm_clients.llm_base import LLMClient, SToolCall
-from src.ai_generation.managers.tool.manager_base import ToolManager
-from src.ai_generation.managers.tool.openrouter import OpenAIToolManager
 from pydantic import BaseModel
 
 
 # TODO: deprecated. Will be removed in future
 class OpenRouterClient(LLMClient):
     def __init__(self):
-        self.tool_manager: ToolManager | None = None
         self._setup_client()
 
     def _setup_client(self):
@@ -21,7 +18,6 @@ class OpenRouterClient(LLMClient):
             api_key=AI_API_KEY,
             base_url="https://openrouter.ai/api/v1",
         )
-        self.tool_manager = OpenAIToolManager()
 
     def _generate_response(
         self,
@@ -90,52 +86,3 @@ class OpenRouterClient(LLMClient):
             temperature=temperature,
         )
         return response.choices[0].message.content
-
-    def _proceed_response(self, response) -> SToolCall:
-        """
-        Assemble LLM tool output to class
-        """
-        message = response.choices[0].message
-        tool_calls: list[SToolCall] | None = None
-        text: str | None = None
-        finish_reason = (
-            str(response.choices[0].finish_reason)
-            if response.choices[0].finish_reason
-            else None
-        )
-
-        if message.tool_calls:
-            tool_calls = []
-            for tc in message.tool_calls:
-                tool_calls.append(
-                    SToolCall(name=tc.function.name, arguments=tc.function.arguments)
-                )
-
-        if message.content:
-            text = message.content
-
-        return SToolCall(text=text, tool_calls=tool_calls, finish_reason=finish_reason)
-
-    def generate_tool_call(
-        self,
-        prompt: str,
-        system_prompt: str,
-        tools: list[Any] | None = None,
-        reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
-        temperature: float | None = None,
-    ) -> SToolCall:
-        if tools:
-            self.tool_manager.save_tools(tools)
-            tools_config = self.tool_manager.get_tools()
-        else:
-            tools_config = None
-
-        response = self._generate_response(
-            prompt=prompt,
-            system_prompt=system_prompt,
-            extra_body={"reasoning": {"effort": reasoning_mode}},
-            tools=tools_config,
-            temperature=temperature,
-        )
-
-        return self._proceed_response(response)
