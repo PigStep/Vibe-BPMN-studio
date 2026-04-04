@@ -25,6 +25,7 @@ def _run_tools(
     session_id: str,
 ):
     for tool_call in response.tool_calls:
+        # FIXME: only 1 tool in use for now. Update logic for multiple ones
         result = generate_draft.invoke(
             tool_call["args"],
             config={
