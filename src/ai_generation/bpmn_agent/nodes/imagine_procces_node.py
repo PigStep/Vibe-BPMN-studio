@@ -1,10 +1,10 @@
-from src.ai_generation.bpmn_agent.state import SimpleBPMNAgent
+from src.ai_generation.bpmn_agent.state import AgentState
 from src.ai_generation.llm_clients import LLMClient
 
 
 def generate_process(
-    state: SimpleBPMNAgent, llm: LLMClient, configuration: dict
-) -> SimpleBPMNAgent:
+    state: AgentState, llm: LLMClient, configuration: dict
+) -> AgentState:
     """Generate business process as plan for given instructions
 
     Args:

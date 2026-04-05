@@ -1,10 +1,8 @@
-from src.ai_generation.bpmn_agent.state import SimpleBPMNAgent
+from src.ai_generation.bpmn_agent.state import AgentState
 from src.ai_generation.llm_clients import LLMClient
 
 
-def generate_bpmn(
-    state: SimpleBPMNAgent, llm: LLMClient, configuration: dict
-) -> SimpleBPMNAgent:
+def generate_bpmn(state: AgentState, llm: LLMClient, configuration: dict) -> AgentState:
     """Genrates XML code from instructions
 
     Args:
