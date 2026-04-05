@@ -1,7 +1,8 @@
+from langchain_core.messages import HumanMessage
 from langgraph.graph import START, END, StateGraph
 from functools import partial
 
-from src.ai_generation.llm_clients import get_llm_client
+from src.ai_generation.llm_clients import get_llm_client, get_langgraph_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.state import AgentState
 from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
@@ -11,7 +12,7 @@ from src.schemas import SUserInputData
 
 def build_bpmn_agent() -> StateGraph:
     # Define managers and LLM client
-    llm = get_llm_client()
+    llm = get_langgraph_llm_client()
     prompt_manager = LLMConfigManager(r"data/prompts/")
     agent_builder = StateGraph(AgentState)
 
@@ -50,8 +51,5 @@ def get_agent_answer(initial_state: dict) -> dict:
 
 
 def invoke_agent(user_input: SUserInputData) -> str:
-    initial_state = {
-        "user_input": user_input.user_input,
-        "previous_stage": "",
-    }
+    initial_state = {"messages": [HumanMessage(content=user_input.user_input)]}
     return get_agent_answer(initial_state)
