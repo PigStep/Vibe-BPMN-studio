@@ -5,8 +5,8 @@ from functools import partial
 from src.ai_generation.llm_clients import get_llm_client, get_langgraph_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.state import AgentState
-from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
-from src.ai_generation.bpmn_agent.nodes.imagine_procces_node import generate_process
+from src.ai_generation.bpmn_agent.nodes import generate_bpmn
+from src.ai_generation.bpmn_agent.nodes import generate_process
 from src.schemas import SUserInputData
 
 

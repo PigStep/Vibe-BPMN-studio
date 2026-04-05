@@ -1,4 +1,6 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock
+from unittest.mock import patch
+import pytest
 
 from src.schemas import SUserInputData
 from src.ai_generation.bpmn_agent.agent import invoke_agent
@@ -8,37 +10,64 @@ SCRIPT_DIR = "src.ai_generation.bpmn_agent.agent"
 # --- TESTS ---
 
 
-def test_agent_invoke(mocker):
-    """
-    Invoke_agent transform userdata to dictionary for agent.
-    Tets does invoke agent build and call agent
-    """
-    mock_agent = mocker.patch(SCRIPT_DIR + "._agent")
-    mock_agent.invoke.return_value = {"result": "success"}
-    test_user_data = SUserInputData(session_id="test_id", user_input="Send me success")
-
-    result = invoke_agent(test_user_data)
-
-    mock_agent.invoke.assert_called_once_with(
-        {
-            "user_input": "Send me success",
-            "previous_stage": "",  # under the logic. Basic config for first call
-        }
-    )
-    assert result == {"result": "success"}  # Result should be the agent returns
+@pytest.fixture
+def mock_dependencies():
+    with patch(
+        SCRIPT_DIR + ".get_dependencies",
+    ) as mock_func:
+        mock_config = MagicMock()
+        mock_non_langgraph_llm = MagicMock()
+        mock_llm_with_tools = MagicMock()
+        mock_func.return_value = (
+            mock_config,
+            mock_non_langgraph_llm,
+            mock_llm_with_tools,
+        )
+        yield mock_func, mock_config, mock_non_langgraph_llm, mock_llm_with_tools
 
 
-def test_agent_full_flow(mocker):
-    """Test agent do not fall down during call"""
-    mock_llm = mocker.patch(SCRIPT_DIR + ".get_llm_client")
-    mock_process_node = mocker.patch(SCRIPT_DIR + ".generate_process")
-    mock_bpmn_node = mocker.patch(SCRIPT_DIR + ".generate_bpmn")
+def test_invoking_agent(mock_dependencies):
+    "Test agent invoking and dependecies injected"
+    mock_func, mock_config, mock_llm, mock_llm_with_tools = mock_dependencies
 
-    mock_llm.return_value = Mock()
-    mock_process_node.return_value = {"result": "called"}
-    mock_bpmn_node.return_value = {"result": "called"}
+    test_user_data = SUserInputData(session_id="test", user_input="test")
+    mock_llm_with_tools.invoke.result_value = MagicMock()
+    invoke_agent(test_user_data)
 
-    invoke_agent(SUserInputData(session_id="test_id", user_input="Test flow"))
+    mock_func.assert_called_once()  # Check are dependencies inserted
+    mock_llm_with_tools.invoke.assert_called_once()  # Check agent was invoked
 
-    assert mock_process_node.called
-    assert mock_process_node.called
+
+def test_agent_tool_invoking(mock_dependencies):
+    """Test agent invoking get dependecies -> agent invoke -> tool ivoking -> return xml"""
+    mock_func, mock_config, mock_llm, mock_llm_with_tools = mock_dependencies
+
+    test_user_data = SUserInputData(session_id="test", user_input="test")
+
+    with patch(SCRIPT_DIR + ".generate_draft") as mock_generate_draft:
+        # response that llm return for tool call
+        response = MagicMock()
+        response.tool_calls = [
+            {
+                "args": "function_args",
+                "configurable": {
+                    "llm": mock_llm,
+                    "config_manager": mock_config,
+                    "session_id": "test",
+                },
+            }
+        ]
+        mock_generate_draft.invoke.return_value = MagicMock()
+        mock_llm_with_tools.invoke.return_value = response
+        invoke_agent(test_user_data)
+
+        mock_generate_draft.invoke.assert_called_once_with(
+            "function_args",
+            config={
+                "configurable": {
+                    "llm": mock_llm,
+                    "config_manager": mock_config,
+                    "session_id": "test",
+                }
+            },
+        )
