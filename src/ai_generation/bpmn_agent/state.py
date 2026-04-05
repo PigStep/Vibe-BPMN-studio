@@ -5,5 +5,3 @@ import operator
 
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], operator.add]
-    user_input: str
-    previous_answer: str
