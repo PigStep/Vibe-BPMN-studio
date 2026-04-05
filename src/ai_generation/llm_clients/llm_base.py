@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Literal, Any
 
 
+# TODO: deprecated. Dead code. Delete
 class LLMClient(ABC):
     @abstractmethod
     def generate_response_text_based(
