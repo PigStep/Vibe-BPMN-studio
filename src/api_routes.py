@@ -20,9 +20,7 @@ async def generate_bpmn(user_data: SUserInputData) -> SAgentOutput:
     """
     logger.info("Recived diagram request. SessionID: %s", user_data.session_id)
     xml = await asyncio.to_thread(invoke_agent, user_data)
-    return {
-        "output": xml.get("previous_answer", "Sorry, tech problem. Please retry later.")
-    }
+    return {"output": xml}
 
 
 @router.get("/example-bpmn-xml")

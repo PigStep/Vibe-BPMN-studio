@@ -47,7 +47,7 @@ def get_agent_answer(initial_state: dict) -> dict:
     if _agent is None:
         _agent = build_bpmn_agent().compile()
     result = _agent.invoke(initial_state)
-    return result
+    return result["messages"][-1].content[0]["text"]
 
 
 def invoke_agent(user_input: SUserInputData) -> str:
