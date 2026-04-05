@@ -1,21 +1,17 @@
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import SystemMessage
 from src.ai_generation.bpmn_agent.state import AgentState
-from src.ai_generation.llm_clients import LLMClient
 
 
 def generate_process(
-    state: AgentState, llm: LLMClient, configuration: dict
+    state: AgentState, llm: BaseChatModel, configuration: dict
 ) -> AgentState:
-    """Generate business process as plan for given instructions
+    """Generate business process as plan for given instructions"""
+    system = configuration.pop("system_prompt", None)
+    messages = state["messages"]
+    if system:
+        messages = SystemMessage(content=system) + messages
 
-    Args:
-        state (SimpleBPMNAgent): state of agent
-        llm (LLMClient): llm client for content generation
-        configuration (dict): configuration for the llm call (system_prompt, temperature, ...)
-
-    Returns:
-        SimpleBPMNAgent: modified state with generated XML in 'previous_answer' field
-    """
-    user_prompt = state["user_input"]
-    result = llm.generate_response_text_based(user_prompt, **configuration)
-
-    return {**state, "previous_answer": result}
+    llm = llm.bind(**configuration)
+    result = llm.invoke(state["messages"])
+    return {"messages": [result]}
