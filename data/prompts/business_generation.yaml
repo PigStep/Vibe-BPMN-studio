@@ -1,5 +1,4 @@
 temperature: 0.7
-reasoning_mode: high
 system_prompt: |
   Role: BPMN Process Analyst.
   Task: Decompose user input into a formal logic structure for subsequent XML generation.

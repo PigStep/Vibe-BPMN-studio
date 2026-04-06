@@ -19,7 +19,6 @@ def openai_client(monkeypatch):
 # --- TESTS ---
 
 
-# @pytest.mark.skip(reason="Deprecated logic")
 def test_generate_text_response_basic(openai_client):
     """
     Check basic answer
@@ -48,13 +47,10 @@ def test_generate_text_response_basic(openai_client):
         "temperature": None,  # we do not use temperature on this call
         "response_format": None,  # none for text generation
         "extra_body": {"reasoning": {"effort": "none"}},  # none by default
-        "tool_choice": None,
-        "tools": None,
     }  # openai api call by default
 
 
 # TODO: Likvidate tech debt with gemini
-# @pytest.mark.skip(reason="Deprecated logic")
 def test_generate_response_json_structure(openai_client):
     """
     Test that answer correctly sending in JSON structure based response_format.

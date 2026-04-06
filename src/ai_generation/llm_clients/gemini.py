@@ -2,9 +2,9 @@ from typing import Literal
 import logging
 from google.genai import types
 from google import genai
-from pydantic import BaseModel
 from src.ai_generation.llm_clients.llm_base import LLMClient
 from settings import settings
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +19,11 @@ class GeminiClient(LLMClient):
         logger.debug("Using Gemini API key: %s...", api_key[:10])
         self.client = genai.Client(api_key=api_key)
 
-    def generate_response(
+    def _generate_response(
         self,
         prompt: str,
         generation_config: types.GenerateContentConfig,
-    ) -> str | None:
+    ):
         response = self.client.models.generate_content(
             model=self.model_name,
             config=generation_config,
@@ -38,7 +38,7 @@ class GeminiClient(LLMClient):
         reasoning_mode: Literal["none", "minimal", "low", "medium", "high"] = "none",
         temperature: float | None = None,
     ) -> str | None:
-        return self.generate_response(
+        return self._generate_response(
             prompt,
             generation_config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
@@ -60,7 +60,7 @@ class GeminiClient(LLMClient):
             if isinstance(json_schema, type) and issubclass(json_schema, BaseModel)
             else json_schema
         )
-        return self.generate_response(
+        return self._generate_response(
             prompt,
             generation_config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
@@ -70,3 +70,6 @@ class GeminiClient(LLMClient):
                 response_schema=schema,
             ),
         )
+
+
+# https://ai.google.dev/api/generate-content?hl=ru#v1beta.GenerationConfig
