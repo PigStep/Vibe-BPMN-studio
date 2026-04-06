@@ -1,4 +1,5 @@
 from langchain_openai import ChatOpenAI
+from typing_extensions import Literal
 from src.ai_generation.llm_clients.llm_base import LLMClient
 from src.ai_generation.llm_clients.gemini import GeminiClient
 from src.ai_generation.llm_clients.openrouter import OpenRouterClient
