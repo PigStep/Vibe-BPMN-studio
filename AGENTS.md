@@ -2,7 +2,7 @@
 
 ## Overview
 
-FastAPI web app for creating/editing BPMN diagrams with AI-powered assistance. Python 3.13+, LangGraph for AI agents, lxml for XML generation.
+FastAPI-based web app for creating/editing BPMN diagrams with AI-powered assistance. Uses Python 3.13+, LangGraph for AI agents, and lxml for XML generation.
 
 ## Build, Lint, and Test Commands
 
@@ -29,7 +29,8 @@ ruff format .                     # Auto-format
 pytest -v                         # Run all tests
 pytest -v -k "not e2e"           # Unit tests only
 pytest -v -k "e2e"               # E2E tests only
-pytest -v -k "test_name"         # Run single test by name
+pytest -v -k "test_name"         # Single test by name
+pytest -v -k "test_llm"           # Tests matching pattern
 pytest --cov=src --cov-report=term-missing  # With coverage
 ```
 
@@ -37,7 +38,7 @@ pytest --cov=src --cov-report=term-missing  # With coverage
 
 ```bash
 ENVIROMENT=dev                    # dev, prod, test
-OPENROUTER_API_KEY=...           # AI features (never commit)
+OPENROUTER_API_KEY=...           # AI features (never commit this)
 OPENROUTER_MODEL_NAME=...
 ```
 
@@ -57,9 +58,11 @@ from src.ai_generation.llm_clients import get_llm_client
 
 ### Type Hints
 ```python
+# Good
 def foo() -> str | None:
     x: dict | None = None
 
+# Use Literal for enum-like strings
 from typing import Literal
 mode: Literal["none", "low", "high"] = "none"
 ```
@@ -71,30 +74,78 @@ mode: Literal["none", "low", "high"] = "none"
 - **Private methods**: prefix with `_`
 
 ### Docstrings
-Google-style docstrings for public functions. Concise one-liners for simple functions.
+Google-style docstrings for public functions:
+
+```python
+def generate_response(prompt: str, temperature: float = 0.7) -> str | None:
+    """
+    Generate a response from the LLM.
+
+    Parameters
+    ----------
+    prompt : str
+        The user prompt to send to the model.
+    temperature : float, optional
+        Sampling temperature. Default is 0.7.
+
+    Returns
+    -------
+    str | None
+        Content of the response, or None if no content.
+    """
+```
 
 ### Logging
 Always use module-level loggers:
+
 ```python
 import logging
 logger = logging.getLogger(__name__)
 logger.info("Starting process")
+logger.error(f"Failed: {e}")
 ```
 
 ### Error Handling
 - Use try/except with logging for error cases
 - Raise specific exceptions with meaningful messages
-- For API routes, use FastAPI's `HTTPException`
+- For API routes, use FastAPI's `HTTPException`:
+
+```python
+from fastapi import HTTPException
+
+try:
+    result = risky_operation()
+except ValueError as e:
+    logger.error(f"Validation failed: {e}")
+    raise HTTPException(status_code=400, detail=str(e))
+```
 
 ### Pydantic Schemas
 - Use Pydantic v2 with `BaseModel`
 - Define schemas in `src/schemas.py`
-- Use `S` prefix for schema names
+- Use `S` prefix for schema names:
+
+```python
+class SUserInputData(BaseModel):
+    user_input: str
+
+class SAgentOutput(BaseModel):
+    status: bool = True
+    output: str
+```
 
 ### FastAPI Routes
 - Use `APIRouter` for grouping routes
 - Define tags for documentation
 - Use async/await for I/O operations
+
+```python
+router = APIRouter(tags=["API"])
+
+@router.get("/generate")
+async def generate_bpmn(user_input: str) -> SAgentOutput:
+    ...
+```
 
 ## Testing Conventions
 
@@ -102,6 +153,13 @@ logger.info("Starting process")
 - Use pytest fixtures and `mocker` (pytest-mock) for mocking
 - Mark e2e tests with "e2e" in the name
 - Test files: `test_*.py`, functions: `test_*`
+
+```python
+def test_agent_invoke(mocker):
+    mock_agent = mocker.patch("path.to.module")
+    mock_agent.invoke.return_value = {"result": "success"}
+    assert result == expected
+```
 
 ## Project Structure
 
@@ -115,12 +173,16 @@ src/
 │   ├── managers/           # Configuration managers
 │   └── bpmn_agent/         # LangGraph agents
 │       └── simple/         # Simple agent impl
+│           ├── agent.py
+│           ├── state.py
+│           └── get_bpmn_node.py
 └── assemblers/
     ├── xml/                # XML generation (lxml)
     └── json/               # JSON generation
 
 tests/
 └── ai_generation/
+    └── test_agent.py
 ```
 
 ## LLM Client Usage
@@ -139,6 +201,7 @@ result = llm.generate_response_json_based(
 ## XML Generation
 
 Use the builder pattern with lxml:
+
 ```python
 from src.assemblers.xml.bpmn import BpmnBuilder
 
@@ -152,10 +215,3 @@ xml = (
     .build()
 )
 ```
-
-## Key Dependencies
-
-- **fastapi**, **uvicorn** - Web framework
-- **lxml** - XML generation
-- **langgraph** - AI agent orchestration
-- **langchain-openai**, **langchain-google-genai** - LLM integrations
