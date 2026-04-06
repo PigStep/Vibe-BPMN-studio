@@ -1,4 +1,7 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
+
+from langchain_core.messages import AIMessage, HumanMessage
+import pytest
 
 from src.schemas import SUserInputData
 from src.ai_generation.bpmn_agent.agent import invoke_agent
@@ -14,29 +17,50 @@ def test_agent_invoke(mocker):
     Tets does invoke agent build and call agent
     """
     mock_agent = mocker.patch(SCRIPT_DIR + "._agent")
-    mock_agent.invoke.return_value = {"result": "success"}
+    mock_agent.invoke.return_value = {
+        "messages": [
+            HumanMessage("Send me success"),
+            AIMessage(
+                [
+                    # AI message may contain multiple values
+                    # Currently logic extracts only text field
+                    {"text": "succes"}
+                ]
+            ),
+        ]
+    }
     test_user_data = SUserInputData(session_id="test_id", user_input="Send me success")
 
     result = invoke_agent(test_user_data)
 
     mock_agent.invoke.assert_called_once_with(
         {
-            "user_input": "Send me success",
-            "previous_stage": "",  # under the logic. Basic config for first call
+            "messages": [HumanMessage("Send me success")],
         }
     )
-    assert result == {"result": "success"}  # Result should be the agent returns
+    assert result == "succes"  # Result should be the agent returns
 
 
 def test_agent_full_flow(mocker):
     """Test agent do not fall down during call"""
-    mock_llm = mocker.patch(SCRIPT_DIR + ".get_llm_client")
+    mock_llm = mocker.patch(SCRIPT_DIR + ".get_langgraph_llm_client")
     mock_process_node = mocker.patch(SCRIPT_DIR + ".generate_process")
     mock_bpmn_node = mocker.patch(SCRIPT_DIR + ".generate_bpmn")
 
-    mock_llm.return_value = Mock()
-    mock_process_node.return_value = {"result": "called"}
-    mock_bpmn_node.return_value = {"result": "called"}
+    mock_llm.invoke.return_value = MagicMock()
+    # Do not really call nodes
+    mock_process_node.return_value = {
+        "messages": [
+            HumanMessage("Send me success"),
+            AIMessage([{"text": "generate_process called"}]),
+        ]
+    }
+    mock_bpmn_node.return_value = {
+        "messages": [
+            HumanMessage("Send me success"),
+            AIMessage([{"text": "generate_bpmn called"}]),
+        ]
+    }
 
     invoke_agent(SUserInputData(session_id="test_id", user_input="Test flow"))
 
