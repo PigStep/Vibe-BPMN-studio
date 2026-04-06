@@ -4,11 +4,11 @@ Tests verify real API calls and compare reasoning modes by execution time.
 """
 
 from typing import Literal
+from unittest.mock import Mock
 
 from pydantic import BaseModel
 import pytest
 import time
-from src.ai_generation.llm_clients import get_llm_client
 
 SYSTEM_PROMPT = """You are an expert in business process analysis.
 Your task is to thoroughly analyze each request, consider all possible
@@ -49,13 +49,15 @@ class SBpmnBaselineProcess(BaseModel):
     flows: list[SBpmnFlow]
 
 
+@pytest.mark.skip(reason="Using langgraph now, deprecated logic")
 @pytest.mark.parametrize("reasoning_mode", ["minimal", "high"])
 def test_llm_e2e_text_with_reasoning(reasoning_mode: ReasoningMode):
     """
     E2E test: text-based response with different reasoning modes.
     Compares execution time between minimal and high reasoning effort.
     """
-    llm = get_llm_client()
+    # FIXME: previous behaviour mocked. No longer exists
+    llm = Mock()
 
     start = time.time()
     result = llm.generate_response_text_based(
@@ -73,13 +75,16 @@ def test_llm_e2e_text_with_reasoning(reasoning_mode: ReasoningMode):
     )
 
 
+@pytest.mark.skip(reason="Using langgraph now, deprecated logic")
 def test_llm_e2_json_schema():
     """
     E2E test: Generate BPMN process using baseline schema.
     Validates LLM output against SBpmnBaselineProcess Pydantic model.
     Domain: Order Processing (Receive Order -> Process Payment -> Ship)
     """
-    llm = get_llm_client()
+    # FIXME: previous behaviour mocked. No longer exists
+
+    llm = Mock()
 
     result = llm.generate_response_json_based(
         prompt="""Create a simple order processing workflow with:

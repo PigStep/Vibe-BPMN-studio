@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph import START, END, StateGraph
 from functools import partial
 
-from src.ai_generation.llm_clients import get_langgraph_llm_client
+from src.ai_generation.bpmn_agent.langgraph import get_langgraph_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.state import AgentState
 from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
