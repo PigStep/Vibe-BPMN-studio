@@ -1,4 +1,6 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock
+
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from src.ai_generation.bpmn_agent.nodes.imagine_procces_node import generate_process
 
@@ -6,11 +8,26 @@ from src.ai_generation.bpmn_agent.nodes.imagine_procces_node import generate_pro
 
 
 def test_generate_procces():
-    """Test is generated xml in the state and AI API have been called"""
-    client = Mock()
-    client.generate_response_text_based.return_value = "Process of the plan>"
-    state = {"previous_answer": "Test", "user_input": "Test"}
+    """Test is node invoking llm to generate process plan"""
+    client = MagicMock()
+    bound_client = MagicMock()
+    client.bind.return_value = bound_client
+    bound_client.invoke.return_value = AIMessage(  # invoke() called on bound_client
+        content=[{"text": "process text description"}]
+    )
 
-    result = generate_process(state, client, {})  # config empty due llm_mock
-    assert result["previous_answer"] == "Process of the plan>"
-    client.generate_response_text_based.assert_called_once()
+    configuration = {"system_prompt": "dummy_system", "temperature": 0.2}
+
+    state = {"messages": [HumanMessage(content="dummy_input")]}
+
+    result = generate_process(state, client, configuration)
+
+    assert (
+        result["messages"][-1].content[0]["text"] == "process text description"
+    )  # Result of LLm invoking
+    bound_client.invoke.assert_called_once_with(
+        [
+            SystemMessage("dummy_system"),
+            HumanMessage("dummy_input"),
+        ]
+    )  # Sustem prompt is inserting

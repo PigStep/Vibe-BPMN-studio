@@ -1,7 +1,6 @@
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock
 
 from langchain_core.messages import AIMessage, HumanMessage
-import pytest
 
 from src.schemas import SUserInputData
 from src.ai_generation.bpmn_agent.agent import invoke_agent

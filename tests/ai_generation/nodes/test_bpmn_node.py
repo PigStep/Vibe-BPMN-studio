@@ -1,4 +1,6 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock
+
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
 
@@ -7,10 +9,25 @@ from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
 
 def test_generation():
     """Test is generated xml in the state and AI API have been called"""
-    client = Mock()
-    client.generate_response_text_based.return_value = "<bpmn>xml</bpmn>"
-    state = {"previous_answer": "Test", "user_input": "Test"}
+    client = MagicMock()
+    bound_client = MagicMock()
+    client.bind.return_value = bound_client
+    bound_client.invoke.return_value = AIMessage(  # invoke() called on bound_client
+        content=[{"text": "LLM RETURNED <XML>"}]
+    )
 
-    result = generate_bpmn(state, client, {})  # config empty due llm_mock
-    assert result["previous_answer"] == "<bpmn>xml</bpmn>"
-    client.generate_response_text_based.assert_called_once()
+    configuration = {"system_prompt": "dummy_system", "temperature": 0.2}
+
+    state = {"messages": [HumanMessage(content="dummy_input")]}
+
+    result = generate_bpmn(state, client, configuration)
+
+    assert (
+        result["messages"][-1].content[0]["text"] == "LLM RETURNED <XML>"
+    )  # Result of LLm invoking
+    bound_client.invoke.assert_called_once_with(
+        [
+            SystemMessage("dummy_system"),
+            HumanMessage("dummy_input"),
+        ]
+    )  # Sustem prompt is inserting
