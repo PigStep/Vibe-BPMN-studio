@@ -3,7 +3,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from src.ai_generation.bpmn_agent.state import AgentState
 
 
-def generate_bpmn(
+def generate_xml(
     state: AgentState, llm: BaseChatModel, configuration: dict
 ) -> AgentState:
     """Generates XML code from instructions"""

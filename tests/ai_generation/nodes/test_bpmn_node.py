@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
-from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
+from ai_generation.bpmn_agent.nodes.generate_xml import generate_xml
 
 # --- TEST ---
 
@@ -20,7 +20,7 @@ def test_generation():
 
     state = {"messages": [HumanMessage(content="dummy_input")]}
 
-    result = generate_bpmn(state, client, configuration)
+    result = generate_xml(state, client, configuration)
 
     assert (
         result["messages"][-1].content[0]["text"] == "LLM RETURNED <XML>"

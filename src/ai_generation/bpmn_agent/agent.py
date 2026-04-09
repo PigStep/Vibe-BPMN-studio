@@ -16,7 +16,7 @@ from src.ai_generation.bpmn_agent.langgraph import get_langgraph_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.state import AgentState
 from src.ai_generation.bpmn_agent.nodes import (
-    generate_bpmn,
+    generate_xml,
     generate_process,
 )
 from src.schemas import SUserInputData
@@ -37,7 +37,7 @@ def build_bpmn_agent() -> StateGraph:
         configuration=prompt_manager.get_call_config("business_generation"),
     )
     generate_bpmn_with_config = partial(
-        generate_bpmn,
+        generate_xml,
         llm=llm,
         configuration=prompt_manager.get_call_config("XML_generation"),
     )
@@ -72,20 +72,22 @@ def _get_user_data(
     user_input: SUserInputData,
 ):
     session_exists = checkpointer.get_tuple(config) is not None
-    logger.debug("%s, Entering graph. Is first input: %s", not session_exists)
-    # Resume graph if user had conversation before, initial state if this is first invoke
-    input_data = (
-        Command(goto="imagine", resume=user_input.user_input)  # Load user feedback
-        if session_exists
-        else initial_state
+    logger.debug(
+        "%s, Entering graph. Is first input: %s",
+        user_input.session_id,
+        not session_exists,
     )
-    return input_data
+    if session_exists:
+        # Return new user message - checkpointer auto-loads previous state
+        return {"messages": [HumanMessage(content=user_input.user_input)]}
+    return initial_state
 
 
 def get_agent_answer(
     agent: CompiledStateGraph, invoke_data: dict, config: RunnableConfig
 ) -> dict:
     result = agent.invoke(invoke_data, config=config)
+    logger.debug("Last agent message: %s", result["messages"][-1])
     return result["messages"][-1].content[0]["text"]
 
 
