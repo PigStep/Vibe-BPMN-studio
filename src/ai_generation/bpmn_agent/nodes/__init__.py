@@ -1,0 +1,2 @@
+from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
+from src.ai_generation.bpmn_agent.nodes.imagine_procces_node import generate_process
