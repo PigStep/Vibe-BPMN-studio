@@ -48,7 +48,7 @@ def build_bpmn_agent() -> StateGraph:
 
     agent_builder.add_edge(START, "imagine")
     agent_builder.add_edge("imagine", "generate")
-    agent_builder.add_edge("generate", END)
+    agent_builder.add_edge("generate", "imagine")
     return agent_builder
 
 
@@ -86,13 +86,29 @@ def _get_user_data(
 def get_agent_answer(
     agent: CompiledStateGraph, invoke_data: dict, config: RunnableConfig
 ) -> dict:
-    result = agent.invoke(invoke_data, config=config)
-    logger.debug("Last agent message: %s", result["messages"][-1])
-    return result["messages"][-1].content[0]["text"]
+    response = agent.invoke(invoke_data, config=config)
+    result = None
+    if "__interrupt__" in response:
+        logger.debug(
+            "Agent was interupted. Interrupt message: %s", response["__interrupt__"]
+        )
+        # '__interrupt__': [
+        # Interrupt(value={"xml_result": "xml code here"}, id='...'),
+        # if multiple interrupts called they will be there
+        # ]
+        result = response["__interrupt__"][0].value["xml_result"]
+    else:
+        # LLM have not interrupted
+        result = response["messages"][-1].content[0]["text"]
+    logger.debug("Last agent message: %s", result)
+    return result
 
 
 def invoke_agent(user_input: SUserInputData) -> str:
-    initial_state = {"messages": [HumanMessage(content=user_input.user_input)]}
+    initial_state = {
+        "messages": [HumanMessage(content=user_input.user_input)],
+        "session_id": user_input.session_id,
+    }
     config: RunnableConfig = {"configurable": {"thread_id": user_input.session_id}}
     agent, checkpointer = get_agent()
     invoke_data = _get_user_data(checkpointer, initial_state, config, user_input)
