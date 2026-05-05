@@ -18,13 +18,21 @@ def generate_xml(
     messages = state["messages"]
     if system:
         messages = [SystemMessage(content=system)] + messages
+    logger.debug(
+        "Session %s. XML generation messages: %s", state["session_id"], messages
+    )
     xml_response = llm.bind(**config_copy).invoke(messages)
+    logger.debug(
+        "Session %s. LLM response: %s, text: '%s'",
+        state["session_id"],
+        xml_response,
+        xml_response.text,
+    )
     xml_content = xml_response.text
     logger.info("Session %s. Generating XML", state["session_id"])
     user_feedback = interrupt({"xml_result": xml_content})
     return {
         "messages": [  # type: ignore
-            AIMessage(content=xml_content),
             HumanMessage(content=user_feedback),
         ]
     }
