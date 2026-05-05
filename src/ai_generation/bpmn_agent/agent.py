@@ -1,15 +1,14 @@
 import logging
+from functools import partial
 
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command
-from langgraph.graph import START, END, StateGraph
-from functools import partial
+from langgraph.graph import START, StateGraph
 from langgraph.checkpoint.memory import (
     InMemorySaver,
-    BaseCheckpointSaver,
 )
+from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph.state import CompiledStateGraph
 
 from src.ai_generation.bpmn_agent.langgraph import get_langgraph_llm_client
@@ -53,40 +52,50 @@ def build_bpmn_agent() -> StateGraph:
 
 
 _checkpointer: BaseCheckpointSaver | None = None
-_agent: BaseChatModel | None = None
+_agent: CompiledStateGraph | None = None
 
 
-def get_agent():
+def get_agent() -> tuple[CompiledStateGraph, BaseCheckpointSaver]:
     global _agent, _checkpointer
-    if _agent is None:
+    if not _agent or not _checkpointer:
         # TODO: implement fabric to get different checkpointers
         _checkpointer = InMemorySaver()
         _agent = build_bpmn_agent().compile(checkpointer=_checkpointer)
     return _agent, _checkpointer
 
 
-def _get_user_data(
+def _session_exist(
     checkpointer: BaseCheckpointSaver,
-    initial_state: dict,
     config: RunnableConfig,
     user_input: SUserInputData,
-):
+) -> bool:
     session_exists = checkpointer.get_tuple(config) is not None
     logger.debug(
         "%s, Entering graph. Is first input: %s",
         user_input.session_id,
         not session_exists,
     )
-    if session_exists:
-        # Return new user message - checkpointer auto-loads previous state
-        return {"messages": [HumanMessage(content=user_input.user_input)]}
-    return initial_state
+    return session_exists
 
 
-def get_agent_answer(
-    agent: CompiledStateGraph, invoke_data: dict, config: RunnableConfig
+def _invoke_agent(
+    agent: CompiledStateGraph,
+    session_exist: bool,
+    config: RunnableConfig,
+    user_request: SUserInputData,
 ) -> dict:
-    response = agent.invoke(invoke_data, config=config)
+    if session_exist:
+        response = agent.invoke(Command(resume=user_request.user_input), config)
+    else:
+        initial_state = {
+            "messages": [HumanMessage(content=user_request.user_input)],
+            "session_id": user_request.session_id,
+        }
+        response = agent.invoke(initial_state, config=config)
+    return response
+
+
+def _proceed_response(response: dict) -> str:
     result = None
     if "__interrupt__" in response:
         logger.debug(
@@ -104,13 +113,11 @@ def get_agent_answer(
     return result
 
 
-def invoke_agent(user_input: SUserInputData) -> str:
-    initial_state = {
-        "messages": [HumanMessage(content=user_input.user_input)],
-        "session_id": user_input.session_id,
-    }
-    config: RunnableConfig = {"configurable": {"thread_id": user_input.session_id}}
+def invoke_agent(user_request: SUserInputData) -> str:
+    config: RunnableConfig = {"configurable": {"thread_id": user_request.session_id}}
     agent, checkpointer = get_agent()
-    invoke_data = _get_user_data(checkpointer, initial_state, config, user_input)
+    # If session exists - continue it
+    session_exist = _session_exist(checkpointer, config, user_request)
+    response = _invoke_agent(agent, session_exist, config, user_request)
 
-    return get_agent_answer(agent, invoke_data, config)
+    return _proceed_response(response)
