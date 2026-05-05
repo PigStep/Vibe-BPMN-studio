@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.language_models.chat_models import BaseChatModel
-from pydantic import Secret, SecretStr
+from pydantic import SecretStr
 from settings import settings
 
 _llm: BaseChatModel | None = None
@@ -19,7 +19,7 @@ def get_langgraph_llm_client() -> BaseChatModel:
 
                 if model is None or key is None:
                     raise ValueError(
-                        f"Enviroment model and api_key were not set up. Check .env"
+                        "Enviroment model and api_key were not set up. Check .env"
                     )
 
                 _llm = ChatGoogleGenerativeAI(
@@ -33,7 +33,7 @@ def get_langgraph_llm_client() -> BaseChatModel:
 
                 if model is None or key is None:
                     raise ValueError(
-                        f"Enviroment model and api_key were not set up. Check .env"
+                        "Enviroment model and api_key were not set up. Check .env"
                     )
 
                 _llm = ChatOpenAI(

@@ -1,7 +1,7 @@
 import logging
 
 from langgraph.types import interrupt
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 from src.ai_generation.bpmn_agent.state import AgentState
 
