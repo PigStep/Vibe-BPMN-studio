@@ -14,8 +14,8 @@ def get_langgraph_llm_client() -> BaseChatModel:
     if _llm is None:
         match provider:
             case "gemini":
-                model = settings.OPENROUTER_MODEL_NAME
-                key = settings.OPENROUTER_API_KEY
+                model = settings.GEMINI_MODEL_NAME
+                key = settings.GEMINI_API_KEY
 
                 if model is None or key is None:
                     raise ValueError(
