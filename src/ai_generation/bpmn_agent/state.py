@@ -5,3 +5,4 @@ import operator
 
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], operator.add]
+    session_id: str

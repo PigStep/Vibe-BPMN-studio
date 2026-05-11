@@ -1,13 +1,26 @@
-from langchain_core.messages import HumanMessage
-from langgraph.graph import START, END, StateGraph
+import logging
 from functools import partial
+
+from langchain_core.messages import HumanMessage
+from langchain_core.runnables import RunnableConfig
+from langgraph.types import Command
+from langgraph.graph import START, StateGraph
+from langgraph.checkpoint.memory import (
+    InMemorySaver,
+)
+from langgraph.checkpoint.base import BaseCheckpointSaver
+from langgraph.graph.state import CompiledStateGraph
 
 from src.ai_generation.bpmn_agent.langgraph import get_langgraph_llm_client
 from src.ai_generation.managers.llm_config import LLMConfigManager
 from src.ai_generation.bpmn_agent.state import AgentState
-from src.ai_generation.bpmn_agent.nodes.get_bpmn_node import generate_bpmn
-from src.ai_generation.bpmn_agent.nodes.imagine_procces_node import generate_process
+from src.ai_generation.bpmn_agent.nodes import (
+    generate_xml,
+    generate_process,
+)
 from src.schemas import SUserInputData
+
+logger = logging.getLogger(__name__)
 
 
 def build_bpmn_agent() -> StateGraph:
@@ -23,7 +36,7 @@ def build_bpmn_agent() -> StateGraph:
         configuration=prompt_manager.get_call_config("business_generation"),
     )
     generate_bpmn_with_config = partial(
-        generate_bpmn,
+        generate_xml,
         llm=llm,
         configuration=prompt_manager.get_call_config("XML_generation"),
     )
@@ -34,22 +47,77 @@ def build_bpmn_agent() -> StateGraph:
 
     agent_builder.add_edge(START, "imagine")
     agent_builder.add_edge("imagine", "generate")
-    agent_builder.add_edge("generate", END)
-
+    agent_builder.add_edge("generate", "imagine")
     return agent_builder
 
 
-_agent = None
+_checkpointer: BaseCheckpointSaver | None = None
+_agent: CompiledStateGraph | None = None
 
 
-def get_agent_answer(initial_state: dict) -> dict:
-    global _agent
-    if _agent is None:
-        _agent = build_bpmn_agent().compile()
-    result = _agent.invoke(initial_state)
-    return result["messages"][-1].content[0]["text"]
+def get_agent() -> tuple[CompiledStateGraph, BaseCheckpointSaver]:
+    global _agent, _checkpointer
+    if not _agent or not _checkpointer:
+        # TODO: implement fabric to get different checkpointers
+        _checkpointer = InMemorySaver()
+        _agent = build_bpmn_agent().compile(checkpointer=_checkpointer)
+    return _agent, _checkpointer
 
 
-def invoke_agent(user_input: SUserInputData) -> str:
-    initial_state = {"messages": [HumanMessage(content=user_input.user_input)]}
-    return get_agent_answer(initial_state)
+def _session_exist(
+    checkpointer: BaseCheckpointSaver,
+    config: RunnableConfig,
+    user_input: SUserInputData,
+) -> bool:
+    session_exists = checkpointer.get_tuple(config) is not None
+    logger.debug(
+        "%s, Entering graph. Is first input: %s",
+        user_input.session_id,
+        not session_exists,
+    )
+    return session_exists
+
+
+def _invoke_agent(
+    agent: CompiledStateGraph,
+    session_exist: bool,
+    config: RunnableConfig,
+    user_request: SUserInputData,
+) -> dict:
+    if session_exist:
+        response = agent.invoke(Command(resume=user_request.user_input), config)
+    else:
+        initial_state = {
+            "messages": [HumanMessage(content=user_request.user_input)],
+            "session_id": user_request.session_id,
+        }
+        response = agent.invoke(initial_state, config=config)
+    return response
+
+
+def _proceed_response(response: dict) -> str:
+    result = None
+    if "__interrupt__" in response:
+        logger.debug(
+            "Agent was interupted. Interrupt message: %s", response["__interrupt__"]
+        )
+        # '__interrupt__': [
+        # Interrupt(value={"xml_result": "xml code here"}, id='...'),
+        # if multiple interrupts called they will be there
+        # ]
+        result = response["__interrupt__"][0].value["xml_result"]
+    else:
+        # LLM have not interrupted
+        result = response["messages"][-1].content[0]["text"]
+    logger.debug("Last agent message: %s", result)
+    return result
+
+
+def invoke_agent(user_request: SUserInputData) -> str:
+    config: RunnableConfig = {"configurable": {"thread_id": user_request.session_id}}
+    agent, checkpointer = get_agent()
+    # If session exists - continue it
+    session_exist = _session_exist(checkpointer, config, user_request)
+    response = _invoke_agent(agent, session_exist, config, user_request)
+
+    return _proceed_response(response)
