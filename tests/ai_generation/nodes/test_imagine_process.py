@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from requests import session
 
 from src.ai_generation.bpmn_agent.nodes.imagine_procces_node import generate_process
 
@@ -18,7 +19,7 @@ def test_generate_procces():
 
     configuration = {"system_prompt": "dummy_system", "temperature": 0.2}
 
-    state = {"messages": [HumanMessage(content="dummy_input")]}
+    state = {"messages": [HumanMessage(content="dummy_input")], "session_id": "test_id"}
 
     result = generate_process(state, client, configuration)
 
