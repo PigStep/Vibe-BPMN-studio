@@ -1,4 +1,3 @@
-
 import pytest
 from langchain_core.messages import AIMessage
 from langgraph.types import Command, Interrupt, interrupt
