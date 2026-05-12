@@ -55,13 +55,18 @@ _checkpointer: BaseCheckpointSaver | None = None
 _agent: CompiledStateGraph | None = None
 
 
-def get_agent() -> tuple[CompiledStateGraph, BaseCheckpointSaver]:
-    global _agent, _checkpointer
-    if not _agent or not _checkpointer:
+def _get_checpointer() -> BaseCheckpointSaver:
+    global _checkpointer
+    if not _checkpointer:
         # TODO: implement fabric to get different checkpointers
         _checkpointer = InMemorySaver()
-        _agent = build_bpmn_agent().compile(checkpointer=_checkpointer)
-    return _agent, _checkpointer
+    return _checkpointer
+
+
+def get_agent() -> tuple[CompiledStateGraph, BaseCheckpointSaver]:
+    checkpointer = _get_checpointer()
+    agent = build_bpmn_agent().compile(checkpointer=_checkpointer)
+    return agent, checkpointer
 
 
 def _session_exist(
