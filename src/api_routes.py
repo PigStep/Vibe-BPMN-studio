@@ -22,9 +22,12 @@ async def generate_bpmn(user_data: SUserInputData) -> SAgentOutput:
     """
     logger.info("Recived diagram request. SessionID: %s", user_data.session_id)
     task = asyncio.create_task((invoke_agent(user_data)))
-    TaskRegistry.register(user_data.session_id, task)
-    xml = await task
-    return {"output": xml}
+    should_run = TaskRegistry.should_start_new_task(user_data.session_id, task)
+    if should_run:
+        xml = await task
+        return {"output": xml}
+    else:
+        return {"output": ""}
 
 
 @router.get("/example-bpmn-xml")
