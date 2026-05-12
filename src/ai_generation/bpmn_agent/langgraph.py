@@ -4,7 +4,6 @@ from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic import SecretStr
-from pydantic_settings import BaseSettings
 from settings import settings
 
 _llm: BaseChatModel | None = None

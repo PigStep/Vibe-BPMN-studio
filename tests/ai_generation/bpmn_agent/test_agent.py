@@ -1,8 +1,5 @@
-from unittest.mock import MagicMock
-
 import pytest
-from langchain_core.messages import AIMessage, HumanMessage
-from langgraph.checkpoint.memory import InMemorySaver
+from langchain_core.messages import AIMessage
 from langgraph.types import Command, Interrupt, interrupt
 
 from src.ai_generation.bpmn_agent.langgraph import reset_llm_client
