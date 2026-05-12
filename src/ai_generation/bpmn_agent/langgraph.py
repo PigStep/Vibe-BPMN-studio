@@ -6,7 +6,6 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic import SecretStr
 from settings import settings
 
-_llm: BaseChatModel | None = None
 provider = settings.PROVIDER_NAME
 
 
@@ -34,25 +33,18 @@ def _match_provider() -> tuple[Literal["gemini", "openrouter"], str, str]:
 def get_langgraph_llm_client() -> BaseChatModel:
     provider, model, api_key = _match_provider()
 
-    global _llm
-    if _llm is None:
-        if provider == "gemini":
-            _llm = ChatGoogleGenerativeAI(
-                model=model,
-                max_retries=7,
-                api_key=SecretStr(api_key),
-            )
-        elif provider == "openrouter":
-            _llm = ChatOpenAI(
-                model=model,
-                max_retries=7,
-                api_key=SecretStr(api_key),
-            )
-        else:
-            raise ValueError(f"Unknown provider: {provider}")
-    return _llm
-
-
-def reset_llm_client():
-    global _llm
-    _llm = None
+    if provider == "gemini":
+        llm = ChatGoogleGenerativeAI(
+            model=model,
+            max_retries=7,
+            api_key=SecretStr(api_key),
+        )
+    elif provider == "openrouter":
+        llm = ChatOpenAI(
+            model=model,
+            max_retries=7,
+            api_key=SecretStr(api_key),
+        )
+    else:
+        raise ValueError(f"Unknown provider: {provider}")
+    return llm
