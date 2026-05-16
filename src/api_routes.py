@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from unittest import result
 from fastapi import APIRouter, HTTPException
 
 from src.get_example_diagram import get_example_diagramm
