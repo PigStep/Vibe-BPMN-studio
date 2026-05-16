@@ -21,7 +21,6 @@ async def generate_bpmn(user_data: SUserInputData) -> SAgentOutput:
     """
     logger.info("Recived diagram request. SessionID: %s", user_data.session_id)
     try:
-        error = 0 / 0
         should_run = TaskRegistry.should_start_new_task(user_data.session_id)
         if should_run:
             task = asyncio.create_task((invoke_agent(user_data)))
