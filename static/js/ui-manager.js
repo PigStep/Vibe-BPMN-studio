@@ -47,11 +47,41 @@ class UIManager {
         messageDiv.appendChild(span);
         this.chatHistory.appendChild(messageDiv);
         this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
+    }
 
-        setTimeout(() => {
-            messageDiv.classList.add('fade-out');
-            setTimeout(() => messageDiv.remove(), 300);
-        }, 2000);
+    addRetryBadge(text, onRetry) {
+        this._removeTyping();
+        const userMessages = this.chatHistory.querySelectorAll('.message.user');
+        const lastUserMsg = userMessages[userMessages.length - 1];
+        if (!lastUserMsg) return;
+
+        lastUserMsg.classList.add('blocked');
+
+        const retryBar = document.createElement('div');
+        retryBar.className = 'retry-bar';
+
+        const retryText = document.createElement('span');
+        retryText.className = 'retry-text';
+        retryText.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Предыдущий запрос ещё выполняется. Дождитесь ответа.';
+
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.innerHTML = '<i class="fa-solid fa-rotate"></i>';
+        retryBtn.title = 'Повторить запрос';
+        retryBtn.addEventListener('click', () => {
+            this._removeRetryBadge(lastUserMsg);
+            onRetry(text);
+        });
+
+        retryBar.appendChild(retryText);
+        retryBar.appendChild(retryBtn);
+        lastUserMsg.appendChild(retryBar);
+    }
+
+    _removeRetryBadge(msgElement) {
+        const bar = msgElement.querySelector('.retry-bar');
+        if (bar) bar.remove();
+        msgElement.classList.remove('blocked');
     }
 
     hideTyping() {

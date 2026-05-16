@@ -135,10 +135,38 @@
             chatInput.value = '';
             uiManager.showTyping();
 
+            const handleBlocked = (blockedText) => {
+                const retryFn = async () => {
+                    uiManager.showTyping();
+                    try {
+                        const botResponse = await botResponder.generateResponse(blockedText, sessionId);
+                        if (!botResponse) {
+                            uiManager.hideTyping();
+                            uiManager.addRetryBadge(blockedText, retryFn);
+                            return;
+                        }
+                        const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
+                        if (xmlMatch) {
+                            const xmlContent = xmlMatch[0];
+                            const cleanXml = xmlContent.replace(/^```xml\s*/, '').replace(/```$/, '');
+                            await updateDiagram(cleanXml);
+                            uiManager.addSuccess('Готово!');
+                        } else if (botResponse.includes('Sorry') || botResponse.includes('tech problem')) {
+                            uiManager.addMessage('К сожалению, сервис AI недоступен. Попробуйте позже.');
+                        }
+                    } catch (error) {
+                        console.error('Error generating bot response:', error);
+                        uiManager.addMessage('К сожалению, произошла ошибка. Попробуйте позже.');
+                    }
+                };
+
+                uiManager.addRetryBadge(blockedText, retryFn);
+            };
+
             try {
                 const botResponse = await botResponder.generateResponse(text, sessionId, (error) => {
                     if (error.message === 'blocked') {
-                        notificationManager.warning('Предыдущий запрос ещё выполняется. Подождите.', 5000);
+                        handleBlocked(text);
                         return;
                     }
                     notificationManager.error('Сервис AI не отвечает. Используйте панель XML код и сторонний LLM.');
