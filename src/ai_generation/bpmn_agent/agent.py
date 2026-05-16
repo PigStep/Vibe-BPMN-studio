@@ -52,10 +52,9 @@ def build_bpmn_agent() -> StateGraph:
 
 
 _checkpointer: BaseCheckpointSaver | None = None
-_agent: CompiledStateGraph | None = None
 
 
-def _get_checpointer() -> BaseCheckpointSaver:
+def _get_checkpointer() -> BaseCheckpointSaver:
     global _checkpointer
     if not _checkpointer:
         # TODO: implement fabric to get different checkpointers
@@ -64,8 +63,8 @@ def _get_checpointer() -> BaseCheckpointSaver:
 
 
 def get_agent() -> tuple[CompiledStateGraph, BaseCheckpointSaver]:
-    checkpointer = _get_checpointer()
-    agent = build_bpmn_agent().compile(checkpointer=_checkpointer)
+    checkpointer = _get_checkpointer()
+    agent = build_bpmn_agent().compile(checkpointer=checkpointer)
     return agent, checkpointer
 
 
