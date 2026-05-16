@@ -36,3 +36,7 @@ class TaskRegistry:
     @classmethod
     def register_task(cls, session_id: str, task: asyncio.Task):
         cls._tasks[session_id] = task
+
+    @classmethod
+    def reset_registry(cls):
+        cls._tasks = {}
