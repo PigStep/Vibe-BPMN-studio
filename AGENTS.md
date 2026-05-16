@@ -90,6 +90,44 @@ xml = (
 )
 ```
 
+## Frontend design patterns (vanilla JS + native CSS)
+
+### Visual Baseline (High-Agency Skill)
+- **DESIGN_VARIANCE**: 8 | **MOTION_INTENSITY**: 6 | **VISUAL_DENSITY**: 4
+- **Font**: `Geist` (Google Fonts CDN) — Inter is BANNED. Body inherits via `font-family`.
+- **Palette**: Neutral Zinc/Slate base (`#f8fafc` body, `#ffffff` panels). Single accent: Slate Blue `#475569` (low saturation, no "AI purple/blue").
+- **Shadows**: Diffusion shadows (`0 20px 40px -15px rgba(0,0,0,0.05)`) instead of flat box-shadows.
+- **Transitions**: `cubic-bezier(0.16, 1, 0.3, 1)` on all interactive elements.
+- **Tactile feedback**: `:active { transform: scale(0.97) }` on all `.btn` elements.
+- **Viewport**: Always use `100dvh` (never `100vh`) to prevent iOS Safari layout jumps.
+
+### Micro-interactions (CSS-only, no Framer Motion)
+- **Status dot**: Infinite pulse via `@keyframes pulse` on `.canvas-status::before`.
+- **Typing indicator**: 3 bouncing dots (`typingBounce` keyframes) instead of a spinner.
+- **Fade-in**: `.sidebar-content.active` uses `fadeIn 0.25s` with spring-like cubic-bezier.
+
+### i18n (RU/EN switcher)
+- **File**: `static/js/i18n.js` — global `window.I18N` object with `t()`, `switchLang()`, `translatePage()`.
+- **Markup**: Use `data-i18n="key"` for text, `data-i18n-placeholder="key"` for placeholders, `data-i18n-title="key"` for titles.
+- **Dynamic strings**: In JS, use `I18N.t('key')` (I18N is guaranteed to exist before component scripts run).
+- **Storage**: Language choice persisted in `localStorage` key `vibe-bpmn-lang`.
+
+### Responsive
+- **Breakpoint**: `max-width: 767px` collapses the grid to single-column (canvas top, sidebar bottom at `max-height: 45dvh`).
+- **Toolbar**: Button text labels hidden via `.btn-text` span with `display: none` on mobile; icons remain visible.
+
+### CSS conventions
+- **Grid over flex-math**: Use CSS Grid for layout (`.layout-container { grid-template-columns: 1fr var(--sidebar-width) }`). Never use `calc()` with flex percentages.
+- **Variables**: All colors, spacing, shadows, and timing are in `:root` CSS custom properties.
+- **No h-screen**: Banned. Use `min-h-[100dvh]` or `height: 100dvh`.
+
+### Anti-patterns to avoid
+- No emojis in code or UI (use Font Awesome icons).
+- No Inter font, no "AI purple/blue" accents, no neon glows, no pure black (`#000000`).
+- No 3-column card layouts (use asymmetric grids or split-screen).
+- No generic names/filler copy ("Jane Doe", "Elevate", "Seamless", "Next-Gen").
+- No custom mouse cursors, no `h-screen`, no `unsplash.com` URLs.
+
 ## CI
 
 - `ruff_linter.yml` runs `ruff check . && ruff format --check .` on PRs to main

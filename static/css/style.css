@@ -1,44 +1,21 @@
 :root {
-    /* --- Modern Minimalist Palette (Slate & Blue) --- */
-
-    /* Акценты (Primary) */
-    --c-primary: #2563EB;
-    /* Яркий профессиональный синий */
-    --c-primary-hover: #1d4ed8;
-    /* Темнее для ховера */
+    --c-primary: #475569;
+    --c-primary-hover: #334155;
     --c-primary-text: #ffffff;
-    /* Текст на синем фоне */
-
-    /* Вторичные действия (Secondary) */
     --c-bg-secondary: #f1f5f9;
-    /* Светло-серый фон кнопок */
     --c-bg-secondary-hover: #e2e8f0;
-
-    /* Текст */
     --c-text-main: #0f172a;
-    /* Почти черный (Slate 900) */
     --c-text-muted: #64748b;
-    /* Приглушенный серый (Slate 500) */
-
-    /* Фоны */
     --c-bg-body: #f8fafc;
-    /* Общий фон страницы (едва серый) */
     --c-bg-panel: #ffffff;
-    /* Белый для панелей и хедера */
     --c-bg-canvas: #ffffff;
-    /* Белый для холста (можно сделать точку-сетку) */
-
-    /* Границы и Тени */
     --c-border: #e2e8f0;
-    /* Тонкие светлые границы */
-    --c-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-
-    /* Размеры */
+    --c-shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --c-shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
     --header-height: 56px;
-    /* Чуть компактнее */
     --sidebar-width: 360px;
     --radius: 6px;
-    /* Аккуратные скругления */
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -48,8 +25,8 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    height: 100vh;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    height: 100dvh;
     overflow: hidden;
     color: var(--c-text-main);
     background-color: var(--c-bg-body);
@@ -57,7 +34,6 @@ body {
     flex-direction: column;
 }
 
-/* --- Header --- */
 .app-header {
     height: var(--header-height);
     background-color: var(--c-bg-panel);
@@ -66,8 +42,13 @@ body {
     padding: 0 24px;
     border-bottom: 1px solid var(--c-border);
     justify-content: space-between;
-    box-shadow: var(--c-shadow);
     z-index: 10;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .logo {
@@ -77,10 +58,36 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    letter-spacing: -0.02em;
 }
 
 .logo i {
     color: var(--c-primary);
+}
+
+.lang-switch {
+    background: transparent;
+    border: 1px solid var(--c-border);
+    border-radius: 100px;
+    padding: 3px 11px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    cursor: pointer;
+    transition: all 0.3s var(--ease-smooth);
+    font-family: inherit;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.4;
+}
+
+.lang-switch:hover {
+    border-color: var(--c-text-muted);
+    color: var(--c-text-main);
+}
+
+.lang-switch:active {
+    transform: scale(0.95);
 }
 
 .toolbar {
@@ -96,7 +103,6 @@ body {
     margin: 0 8px;
 }
 
-/* --- Buttons --- */
 .btn {
     border: 1px solid transparent;
     padding: 8px 14px;
@@ -104,22 +110,29 @@ body {
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all 0.3s var(--ease-smooth);
     display: inline-flex;
     align-items: center;
     gap: 8px;
     line-height: 1;
+    will-change: transform;
+}
+
+.btn:active {
+    transform: scale(0.97);
 }
 
 .btn-primary {
     background-color: var(--c-primary);
     color: var(--c-primary-text);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary:hover {
     background-color: var(--c-primary-hover);
-    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: scale(0.97);
 }
 
 .btn-secondary {
@@ -151,7 +164,6 @@ body {
     font-size: 0.8rem;
 }
 
-/* --- Main Layout --- */
 .layout-container {
     flex: 1;
     display: grid;
@@ -159,11 +171,9 @@ body {
     overflow: hidden;
 }
 
-/* --- Canvas Area --- */
 .canvas-area {
     background-color: var(--c-bg-canvas);
     position: relative;
-    /* Создаем эффект точечной сетки для профессионального вида */
     background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
     background-size: 20px 20px;
 }
@@ -178,8 +188,8 @@ body {
     bottom: 24px;
     left: 24px;
     background: var(--c-bg-panel);
-    padding: 8px 12px;
-    border-radius: 20px;
+    padding: 8px 14px;
+    border-radius: 100px;
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--c-text-muted);
@@ -188,20 +198,24 @@ body {
     pointer-events: none;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .canvas-status::before {
     content: '';
     display: block;
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     background-color: #10b981;
-    /* Зеленая точка статуса */
     border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
 }
 
-/* --- Sidebar --- */
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+}
+
 .sidebar {
     background-color: var(--c-bg-panel);
     display: flex;
@@ -227,7 +241,8 @@ body {
     font-size: 0.9rem;
     color: var(--c-text-muted);
     border-bottom: 2px solid transparent;
-    transition: color 0.2s;
+    transition: color 0.3s var(--ease-smooth);
+    font-family: inherit;
 }
 
 .tab-btn:hover {
@@ -251,22 +266,20 @@ body {
 
 .sidebar-content.active {
     display: flex;
-    animation: fadeIn 0.2s ease-out;
+    animation: fadeIn 0.25s var(--ease-smooth);
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(5px);
+        transform: translateY(6px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* --- Chat Styling --- */
 .chat-history {
     flex: 1;
     overflow-y: auto;
@@ -314,7 +327,7 @@ body {
     background-color: var(--c-primary);
     color: white;
     border-bottom-right-radius: 2px;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 2px 8px rgba(71, 85, 105, 0.2);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -324,72 +337,16 @@ body {
     flex: 1;
 }
 
-.message.user.blocked {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    border: 1px solid #f59e0b;
-    box-shadow: 0 0 0 1px #f59e0b, 0 2px 4px rgba(245, 158, 11, 0.15);
-}
-
-.message.user.blocked .msg-content {
-    flex: none;
-    width: 100%;
-}
-
-.retry-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    width: 100%;
-}
-
-.retry-text {
-    font-size: 0.75rem;
-    opacity: 0.85;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex: 1;
-    min-width: 0;
-}
-
-.retry-btn {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.75);
-    cursor: pointer;
-    padding: 6px;
-    font-size: 0.85rem;
-    border-radius: 50%;
-    transition: background 0.2s, color 0.2s;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-
-.retry-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
-}
-
-/* Hint message (первое приветственное сообщение) */
 .message.hint {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    border: 1px dashed #93c5fd;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 1px dashed #94a3b8;
     display: flex;
     align-items: flex-start;
     gap: 10px;
 }
 
 .message.hint i {
-    color: #2563eb;
+    color: var(--c-primary);
     margin-top: 2px;
     flex-shrink: 0;
 }
@@ -399,7 +356,7 @@ body {
 }
 
 .message.hint.fade-out {
-    animation: fadeOutHint 0.3s ease-out forwards;
+    animation: fadeOutHint 0.3s var(--ease-smooth) forwards;
 }
 
 @keyframes fadeOutHint {
@@ -412,44 +369,55 @@ body {
     }
 }
 
-/* Typing indicator (спиннер загрузки) */
 .typing-indicator {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: 6px;
+    padding: 14px 18px;
     background-color: var(--c-bg-secondary);
     border-radius: 12px;
     border-bottom-left-radius: 2px;
     align-self: flex-start;
 }
 
-.typing-indicator .spinner {
-    width: 18px;
-    height: 18px;
-    border: 2px solid var(--c-border);
-    border-top-color: var(--c-primary);
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--c-text-muted);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: typingBounce 1.4s var(--ease-smooth) infinite;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
+.typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.3;
+    }
+    30% {
+        transform: translateY(-10px);
+        opacity: 1;
     }
 }
 
-/* Success message (галочка "Готово") */
 .message.success {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    border: 1px solid #6ee7b7;
+    background: #f8fafc;
+    border: 1px solid rgba(134, 239, 172, 0.5);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .message.success i {
-    color: #10b981;
+    color: #22c55e;
+    opacity: 0.7;
     font-size: 1rem;
 }
 
@@ -469,7 +437,7 @@ body {
     font-family: inherit;
     font-size: 0.9rem;
     background-color: var(--c-bg-body);
-    transition: border-color 0.2s;
+    transition: border-color 0.3s var(--ease-smooth), background-color 0.3s var(--ease-smooth);
 }
 
 #chat-input:focus {
@@ -477,7 +445,6 @@ body {
     background-color: #fff;
 }
 
-/* --- XML Editor Styling --- */
 .xml-controls {
     display: flex;
     justify-content: space-between;
@@ -496,19 +463,16 @@ body {
     width: 100%;
     resize: none;
     background-color: #1e293b;
-    /* Темный фон для кода (SaaS стиль) */
     color: #e2e8f0;
     border: 1px solid var(--c-border);
     padding: 16px;
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    /* Моноширинный шрифт */
     font-size: 0.8rem;
     border-radius: var(--radius);
     line-height: 1.5;
     outline: none;
 }
 
-/* --- Toast Notifications --- */
 .toast-container {
     position: fixed;
     top: calc(var(--header-height) + 16px);
@@ -527,13 +491,13 @@ body {
     padding: 14px 16px;
     background-color: var(--c-bg-panel);
     border-radius: var(--radius);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     border-left: 4px solid var(--c-primary);
-    animation: toastIn 0.25s ease-out;
+    animation: toastIn 0.3s var(--ease-smooth);
 }
 
 .toast-exit {
-    animation: toastOut 0.2s ease-out forwards;
+    animation: toastOut 0.2s var(--ease-smooth) forwards;
 }
 
 @keyframes toastIn {
@@ -610,4 +574,28 @@ body {
 .toast-close:hover {
     background-color: var(--c-bg-secondary);
     color: var(--c-text-main);
+}
+
+@media (max-width: 767px) {
+    .layout-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+    }
+
+    .sidebar {
+        border-left: none;
+        border-top: 1px solid var(--c-border);
+        max-height: 45dvh;
+    }
+
+    .toolbar .btn-text {
+        display: none;
+    }
+
+    .canvas-status {
+        bottom: 16px;
+        left: 16px;
+        font-size: 0.7rem;
+        padding: 6px 12px;
+    }
 }

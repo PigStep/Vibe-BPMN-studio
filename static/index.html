@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/images/favicon_64.ico" type="image/x-icon">
-    <title>Vibe BPMN Editor AI powered</title>
+    <title data-i18n="app_title">Vibe BPMN Editor AI powered</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@14.0.0/dist/assets/diagram-js.css" />
     <link rel="stylesheet" href="https://unpkg.com/bpmn-js@14.0.0/dist/assets/bpmn-js.css" />
@@ -16,44 +20,58 @@
 
 <body>
     <header class="app-header">
-        <div class="logo">
-            <img src="/static/images/favicon_256.ico" alt="favicon"
-                style="height:2em;vertical-align:middle;margin-right:4px;">
-            Vibe BPMN Studio
+        <div class="header-left">
+            <div class="logo">
+                <img src="/static/images/favicon_256.ico" alt=""
+                    style="height:2em;vertical-align:middle;margin-right:4px;">
+                Vibe BPMN Studio
+            </div>
+            <button id="lang-switch" class="lang-switch" data-i18n="lang_switch">EN</button>
         </div>
         <div class="toolbar">
             <input type="file" id="file-input" accept=".bpmn,.xml" hidden>
             <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">
-                <i class="fas fa-folder-open"></i> Открыть
+                <i class="fas fa-folder-open"></i>
+                <span class="btn-text" data-i18n="open">Открыть</span>
             </button>
             <button class="btn btn-secondary" id="download-bpmn">
-                <i class="fas fa-download"></i> Скачать .bpmn
+                <i class="fas fa-download"></i>
+                <span class="btn-text" data-i18n="download_bpmn">Скачать .bpmn</span>
             </button>
             <button class="btn btn-secondary" id="download-svg">
-                <i class="fas fa-image"></i> Скачать .svg
+                <i class="fas fa-image"></i>
+                <span class="btn-text" data-i18n="download_svg">Скачать .svg</span>
             </button>
 
             <div class="divider"></div>
 
-            <button class="btn btn-icon" id="zoom-out" title="Уменьшить"><i class="fas fa-minus"></i></button>
-            <button class="btn btn-icon" id="fit-viewport" title="Подогнать"><i
-                    class="fas fa-compress-arrows-alt"></i></button>
-            <button class="btn btn-icon" id="zoom-in" title="Увеличить"><i class="fas fa-plus"></i></button>
+            <button class="btn btn-icon" id="zoom-out" data-i18n-title="zoom_out" title="Уменьшить">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button class="btn btn-icon" id="fit-viewport" data-i18n-title="fit_viewport" title="Подогнать">
+                <i class="fas fa-compress-arrows-alt"></i>
+            </button>
+            <button class="btn btn-icon" id="zoom-in" data-i18n-title="zoom_in" title="Увеличить">
+                <i class="fas fa-plus"></i>
+            </button>
         </div>
     </header>
 
     <main class="layout-container">
         <section class="canvas-area">
             <div id="bpmn-container"></div>
+            <div class="canvas-status">
+                <span data-i18n="status_online">Online</span>
+            </div>
         </section>
 
         <aside class="sidebar">
             <div class="sidebar-tabs">
                 <button class="tab-btn active" data-target="chat-panel">
-                    <i class="fas fa-robot"></i> AI Ассистент
+                    <i class="fas fa-robot"></i> <span data-i18n="ai_assistant">AI Ассистент</span>
                 </button>
                 <button class="tab-btn" data-target="xml-panel">
-                    <i class="fas fa-code"></i> XML
+                    <i class="fas fa-code"></i> <span data-i18n="xml">XML</span>
                 </button>
             </div>
 
@@ -61,19 +79,21 @@
                 <div class="chat-history" id="chat-history">
                     <div class="message bot hint">
                         <i class="fa-solid fa-lightbulb"></i>
-                        <div class="msg-content">Опишите вашу предметную область. Или загрузите ваш XML код для старта редактирования</div>
+                        <div class="msg-content" data-i18n="hint_text">Опишите вашу предметную область. Или загрузите ваш XML код для старта редактирования</div>
                     </div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Ваш запрос...">
-                    <button id="send-chat" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" id="chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Ваш запрос...">
+                    <button id="send-chat" class="btn btn-primary" data-i18n-title="chat_send" title="Отправить">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
 
             <div id="xml-panel" class="sidebar-content">
                 <div class="xml-controls">
-                    <span class="info-text">Редактирование источника</span>
-                    <button id="apply-xml" class="btn btn-sm btn-primary">Применить</button>
+                    <span class="info-text" data-i18n="xml_edit_label">Редактирование источника</span>
+                    <button id="apply-xml" class="btn btn-sm btn-primary" data-i18n="apply">Применить</button>
                 </div>
                 <textarea id="xml-editor" spellcheck="false"></textarea>
             </div>
@@ -82,8 +102,8 @@
 
     <script src="https://unpkg.com/bpmn-js@14.0.0/dist/bpmn-modeler.development.js"></script>
 
-    <!-- Подключаем все необходимые скрипты в правильном порядке -->
     <script src="/static/js/config.js"></script>
+    <script src="/static/js/i18n.js"></script>
     <script src="/static/js/bpmn-viewer.js"></script>
     <script src="/static/js/bpmn-controls.js"></script>
     <script src="/static/js/ui-manager.js"></script>

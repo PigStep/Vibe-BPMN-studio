@@ -25,6 +25,8 @@
             sessionId = getOrCreateSessionId();
             console.log('Session ID:', sessionId);
 
+            I18N.translatePage();
+
             // Initialize components
             notificationManager = new NotificationManager();
             bpmnViewer = new BPMNViewer();
@@ -32,7 +34,7 @@
             bpmnControls = new BPMNControls(bpmnViewer);
             botResponder = new BotResponder();
 
-            notificationManager.info('Справка: Вы можете загрузить свой XML код в отдельном пункте XML. Используйте, если хотите отрисовать XML с помощью сторонней LLM');
+            notificationManager.info(I18N.t('notification_hint'));
 
             bpmnViewer.initialize();
 
@@ -47,6 +49,11 @@
 
             setupEventListeners();
             uiManager.initTabs();
+
+            // Language switcher
+            document.getElementById('lang-switch').addEventListener('click', function () {
+                I18N.switchLang();
+            });
         } catch (error) {
             console.error('Initialization error:', error);
         }
@@ -131,45 +138,24 @@
             const text = chatInput.value.trim();
             if (!text) return;
 
+            // Guard: don't interrupt an active request
+            if (document.getElementById('typing-indicator')) {
+                notificationManager.warning(I18N.t('request_in_progress'));
+                return;
+            }
+
             uiManager.addMessage(text, true);
             chatInput.value = '';
             uiManager.showTyping();
 
-            const handleBlocked = (blockedText) => {
-                const retryFn = async () => {
-                    uiManager.showTyping();
-                    try {
-                        const botResponse = await botResponder.generateResponse(blockedText, sessionId);
-                        if (!botResponse) {
-                            uiManager.hideTyping();
-                            uiManager.addRetryBadge(blockedText, retryFn);
-                            return;
-                        }
-                        const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
-                        if (xmlMatch) {
-                            const xmlContent = xmlMatch[0];
-                            const cleanXml = xmlContent.replace(/^```xml\s*/, '').replace(/```$/, '');
-                            await updateDiagram(cleanXml);
-                            uiManager.addSuccess('Готово!');
-                        } else if (botResponse.includes('Sorry') || botResponse.includes('tech problem')) {
-                            uiManager.addMessage('К сожалению, сервис AI недоступен. Попробуйте позже.');
-                        }
-                    } catch (error) {
-                        console.error('Error generating bot response:', error);
-                        uiManager.addMessage('К сожалению, произошла ошибка. Попробуйте позже.');
-                    }
-                };
-
-                uiManager.addRetryBadge(blockedText, retryFn);
-            };
-
             try {
                 const botResponse = await botResponder.generateResponse(text, sessionId, (error) => {
                     if (error.message === 'blocked') {
-                        handleBlocked(text);
+                        uiManager.hideTyping();
+                        notificationManager.warning(I18N.t('request_in_progress'));
                         return;
                     }
-                    notificationManager.error('Сервис AI не отвечает. Используйте панель XML код и сторонний LLM.');
+                    notificationManager.error(I18N.t('error_ai_unavailable'));
                 });
 
                 if (!botResponse) {
@@ -177,23 +163,19 @@
                     return;
                 }
 
-                // Try to find XML structure in the response
                 const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
 
                 if (xmlMatch) {
                     const xmlContent = xmlMatch[0];
-                    // Clean up from Markdown formatting
                     const cleanXml = xmlContent.replace(/^```xml\s*/, '').replace(/```$/, '');
-
-                    // Call update function
                     await updateDiagram(cleanXml);
-                    uiManager.addSuccess('Готово!');
+                    uiManager.addSuccess(I18N.t('success'));
                 } else if (botResponse.includes('Sorry') || botResponse.includes('tech problem')) {
-                    uiManager.addMessage('К сожалению, сервис AI недоступен. Попробуйте позже.');
+                    uiManager.addMessage(I18N.t('error_unavailable'));
                 }
             } catch (error) {
                 console.error('Error generating bot response:', error);
-                uiManager.addMessage('К сожалению, произошла ошибка. Попробуйте позже.');
+                uiManager.addMessage(I18N.t('error_generic'));
             }
         });
 
