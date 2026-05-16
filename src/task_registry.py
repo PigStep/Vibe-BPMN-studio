@@ -1,0 +1,42 @@
+import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
+
+# TODO: send notification. User need to know previous answer was killed
+# TODO: add true cancelation mechanism
+# TODO: add cleaning mechanism
+
+
+class TaskRegistry:
+    _tasks: dict[str, asyncio.Task] = {}
+
+    # @classmethod
+    # def register(cls, session_id: str, task: asyncio.Task):
+    #     old_task = cls._tasks.get(session_id, None)
+
+    #     if old_task and not old_task.done():
+    #
+    #         logger.info(
+    #             "Session id: %s. Face with multiple task run. Canceling old one",
+    #             session_id,
+    #         )
+    #         old_task.cancel()
+    #     cls._tasks[session_id] = task
+
+    # TODO: Solution for now. Reiplement in future
+    @classmethod
+    def should_start_new_task(cls, session_id: str) -> bool:
+        existing_task = cls._tasks.get(session_id, None)
+        if existing_task and not existing_task.done():
+            return False
+        else:
+            return True
+
+    @classmethod
+    def register_task(cls, session_id: str, task: asyncio.Task):
+        cls._tasks[session_id] = task
+
+    @classmethod
+    def reset_registry(cls):
+        cls._tasks = {}

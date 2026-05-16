@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException
 from src.get_example_diagram import get_example_diagramm
 from src.ai_generation.bpmn_agent.agent import invoke_agent
 from src.schemas import SExampleBPMN, SAgentOutput, SUserInputData
+from src.task_registry import TaskRegistry
 
 router = APIRouter(
     tags=["API"],
@@ -19,8 +20,22 @@ async def generate_bpmn(user_data: SUserInputData) -> SAgentOutput:
     Generate BPMN XML code to render with bpmn-js
     """
     logger.info("Recived diagram request. SessionID: %s", user_data.session_id)
-    xml = await asyncio.to_thread(invoke_agent, user_data)
-    return {"output": xml}
+    try:
+        should_run = TaskRegistry.should_start_new_task(user_data.session_id)
+        if should_run:
+            task = asyncio.create_task((invoke_agent(user_data)))
+            TaskRegistry.register_task(user_data.session_id, task)
+            xml = await task
+            return SAgentOutput(status=True, output=xml)
+        else:
+            return SAgentOutput(status=False, output="")
+    except Exception as e:
+        logger.error("Session %s. Faced with an error: %s", user_data.session_id, e)
+        logger.exception("Session %s", user_data.session_id, e)
+        raise HTTPException(
+            status_code=500,
+            detail="Sorry, we faced with a problem. Please try later again",
+        )
 
 
 @router.get("/example-bpmn-xml")

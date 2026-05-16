@@ -13,4 +13,5 @@ class SUserInputData(BaseModel):
 
 class SAgentOutput(BaseModel):
     status: bool = True
+    error_description: str = ""
     output: str

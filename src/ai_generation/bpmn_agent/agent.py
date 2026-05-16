@@ -52,16 +52,20 @@ def build_bpmn_agent() -> StateGraph:
 
 
 _checkpointer: BaseCheckpointSaver | None = None
-_agent: CompiledStateGraph | None = None
+
+
+def _get_checkpointer() -> BaseCheckpointSaver:
+    global _checkpointer
+    if not _checkpointer:
+        # TODO: implement fabric to get different checkpointers
+        _checkpointer = InMemorySaver()
+    return _checkpointer
 
 
 def get_agent() -> tuple[CompiledStateGraph, BaseCheckpointSaver]:
-    global _agent, _checkpointer
-    if not _agent or not _checkpointer:
-        # TODO: implement fabric to get different checkpointers
-        _checkpointer = InMemorySaver()
-        _agent = build_bpmn_agent().compile(checkpointer=_checkpointer)
-    return _agent, _checkpointer
+    checkpointer = _get_checkpointer()
+    agent = build_bpmn_agent().compile(checkpointer=checkpointer)
+    return agent, checkpointer
 
 
 def _session_exist(
@@ -78,20 +82,20 @@ def _session_exist(
     return session_exists
 
 
-def _invoke_agent(
+async def _invoke_agent(
     agent: CompiledStateGraph,
     session_exist: bool,
     config: RunnableConfig,
     user_request: SUserInputData,
 ) -> dict:
     if session_exist:
-        response = agent.invoke(Command(resume=user_request.user_input), config)
+        response = await agent.ainvoke(Command(resume=user_request.user_input), config)
     else:
         initial_state = {
             "messages": [HumanMessage(content=user_request.user_input)],
             "session_id": user_request.session_id,
         }
-        response = agent.invoke(initial_state, config=config)
+        response = await agent.ainvoke(initial_state, config=config)
     return response
 
 
@@ -113,11 +117,11 @@ def _proceed_response(response: dict) -> str:
     return result
 
 
-def invoke_agent(user_request: SUserInputData) -> str:
+async def invoke_agent(user_request: SUserInputData) -> str:
     config: RunnableConfig = {"configurable": {"thread_id": user_request.session_id}}
     agent, checkpointer = get_agent()
     # If session exists - continue it
     session_exist = _session_exist(checkpointer, config, user_request)
-    response = _invoke_agent(agent, session_exist, config, user_request)
+    response = await _invoke_agent(agent, session_exist, config, user_request)
 
     return _proceed_response(response)
