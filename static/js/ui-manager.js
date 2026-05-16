@@ -74,10 +74,10 @@ class UIManager {
 
         tabButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                const targetId = e.target.getAttribute('data-target');
+                const targetId = e.currentTarget.getAttribute('data-target');
 
                 tabButtons.forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
+                e.currentTarget.classList.add('active');
 
                 document.querySelectorAll('.sidebar-content').forEach(content => {
                     content.classList.remove('active');
