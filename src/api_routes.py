@@ -20,14 +20,23 @@ async def generate_bpmn(user_data: SUserInputData) -> SAgentOutput:
     Generate BPMN XML code to render with bpmn-js
     """
     logger.info("Recived diagram request. SessionID: %s", user_data.session_id)
-    should_run = TaskRegistry.should_start_new_task(user_data.session_id)
-    if should_run:
-        task = asyncio.create_task((invoke_agent(user_data)))
-        TaskRegistry.register_task(user_data.session_id, task)
-        xml = await task
-        return SAgentOutput(status=True, output=xml)
-    else:
-        return SAgentOutput(status=False, output="")
+    try:
+        error = 0 / 0
+        should_run = TaskRegistry.should_start_new_task(user_data.session_id)
+        if should_run:
+            task = asyncio.create_task((invoke_agent(user_data)))
+            TaskRegistry.register_task(user_data.session_id, task)
+            xml = await task
+            return SAgentOutput(status=True, output=xml)
+        else:
+            return SAgentOutput(status=False, output="")
+    except Exception as e:
+        logger.error("Session %s. Faced with an error: %s", user_data.session_id, e)
+        logger.exception("Session %s", user_data.session_id, e)
+        raise HTTPException(
+            status_code=500,
+            detail="Sorry, we faced with a problem. Please try later again",
+        )
 
 
 @router.get("/example-bpmn-xml")
