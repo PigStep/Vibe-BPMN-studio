@@ -1,15 +1,14 @@
 class BotResponder {
     /**
      * Generates bot response via API
+     * TODO: replace with streaming/SSE for real-time progress
+     *
      * @param {string} userMessage - User message
      * @param {string} sessionId - Session identifier
      * @param {Function} onError - Optional callback for error handling
      * @returns {Promise<string>} Response from server
      */
     async generateResponse(userMessage, sessionId, onError) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-
         try {
             const url = `${window.AppConfig.API_URL}/generate`;
 
@@ -22,7 +21,6 @@ class BotResponder {
                     user_input: userMessage,
                     session_id: sessionId,
                 }),
-                signal: controller.signal,
             });
 
             const data = await response.json();
@@ -46,8 +44,6 @@ class BotResponder {
                 return '';
             }
             return "Sorry, unable to connect to the server.";
-        } finally {
-            clearTimeout(timeoutId);
         }
     }
 }

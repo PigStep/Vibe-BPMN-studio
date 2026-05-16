@@ -22,6 +22,7 @@ class UIManager {
         this.chatHistory.scrollTop = this.chatHistory.scrollHeight;
     }
 
+    // TODO: replace showTyping() with real-time progress updates from SSE/streaming
     showTyping() {
         this._removeTyping();
         const typingDiv = document.createElement('div');
