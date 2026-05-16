@@ -41,7 +41,7 @@ def get_langgraph_llm_client() -> BaseChatModel:
         )
     elif provider == "openrouter":
         llm = ChatOpenAI(
-            name=model,
+            model=model,
             max_retries=7,
             api_key=SecretStr(api_key),
         )

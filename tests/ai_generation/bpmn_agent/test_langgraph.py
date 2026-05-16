@@ -16,4 +16,6 @@ def test_returns_valid_client(mocker):
 
     assert isinstance(agent1, BaseChatModel)
     assert isinstance(agent2, BaseChatModel)
+    assert agent1.model_name == "gemini-3.1-flash-lite-preview"
+    assert agent2.model_name == "gemini-3.1-flash-lite-preview"
     assert agent1 is not agent2  # different objects as run parallel
