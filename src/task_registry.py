@@ -27,8 +27,8 @@ class TaskRegistry:
     # TODO: Solution for now. Reiplement in future
     @classmethod
     def should_start_new_task(cls, session_id: str) -> bool:
-        exisisting_task = cls._tasks.get(session_id, None)
-        if exisisting_task and not exisisting_task.done():
+        existing_task = cls._tasks.get(session_id, None)
+        if existing_task and not existing_task.done():
             return False
         else:
             return True
