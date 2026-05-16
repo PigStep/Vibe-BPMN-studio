@@ -53,6 +53,10 @@ class UIManager {
         }, 2000);
     }
 
+    hideTyping() {
+        this._removeTyping();
+    }
+
     _removeTyping() {
         const existing = document.getElementById('typing-indicator');
         if (existing) existing.remove();

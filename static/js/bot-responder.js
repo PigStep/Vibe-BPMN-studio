@@ -25,17 +25,25 @@ class BotResponder {
                 signal: controller.signal,
             });
 
+            const data = await response.json();
+
+            if (data.status === false) {
+                throw new Error('blocked');
+            }
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
             return data.output || JSON.stringify(data);
 
         } catch (error) {
             console.error('API error:', error);
             if (onError) {
                 onError(error);
+            }
+            if (error.message === 'blocked') {
+                return '';
             }
             return "Sorry, unable to connect to the server.";
         } finally {

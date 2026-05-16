@@ -137,8 +137,17 @@
 
             try {
                 const botResponse = await botResponder.generateResponse(text, sessionId, (error) => {
+                    if (error.message === 'blocked') {
+                        notificationManager.warning('Предыдущий запрос ещё выполняется. Подождите.', 5000);
+                        return;
+                    }
                     notificationManager.error('Сервис AI не отвечает. Используйте панель XML код и сторонний LLM.');
                 });
+
+                if (!botResponse) {
+                    uiManager.hideTyping();
+                    return;
+                }
 
                 // Try to find XML structure in the response
                 const xmlMatch = botResponse.match(/<\?xml[\s\S]*?<\/bpmn:definitions>|<bpmn:definitions[\s\S]*?<\/bpmn:definitions>/);
