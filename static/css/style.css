@@ -159,6 +159,13 @@ body {
     background-color: var(--c-bg-secondary);
 }
 
+.btn-icon:disabled,
+.btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .btn-sm {
     padding: 6px 12px;
     font-size: 0.8rem;

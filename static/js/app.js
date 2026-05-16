@@ -88,6 +88,19 @@
             }
         });
 
+        // Undo / Redo
+        document.getElementById('undo').addEventListener('click', () => {
+            bpmnViewer.undo();
+        });
+        document.getElementById('redo').addEventListener('click', () => {
+            bpmnViewer.redo();
+        });
+        bpmnViewer.onCommandStackChanged(({ canUndo, canRedo }) => {
+            document.getElementById('undo').disabled = !canUndo;
+            document.getElementById('redo').disabled = !canRedo;
+        });
+        bpmnViewer.initKeyboard();
+
         // Zoom controls
         document.getElementById('zoom-in').addEventListener('click', () => {
             bpmnViewer.zoomIn();
